@@ -19,7 +19,10 @@ export default function App() {
 
         {/* Main Content */}
         <View style={styles.content}>
-          <Text style={{ fontSize: 18 }}>Welcome to your rewards</Text>
+          <View style={styles.card}></View>
+          <View style={styles.card}></View>
+          <View style={styles.card}></View>
+          <View style={styles.card}></View>
         </View>
 
         {/* Bottom Tab Bar */}
@@ -63,9 +66,18 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  card: {width: "45%", height: 70, backgroundColor:'#f8f8f8', borderWidth:1, borderColor:'#ddd'},
   profileInitials: { color: '#fff', fontWeight: 'bold' },
   headerTitle: { fontSize: 20, fontWeight: 'bold', marginLeft: 12 },
-  content: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  content: { 
+    padding: 10, 
+    flex: 1, 
+    flexDirection:"row", 
+    flexWrap:"wrap", 
+    justifyContent: 'center', 
+    alignItems: 'flex-start',
+    alignContent: 'flex-start', 
+    gap: 20 },
   tabBar: {
     flexDirection: 'row',
     borderTopWidth: 1,
