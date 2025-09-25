@@ -1,6 +1,6 @@
 import { FontAwesome5, Ionicons, MaterialIcons } from '@expo/vector-icons';
 import React from 'react';
-import { StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StatusBar, StyleSheet, Text, TouchableOpacity, View, ImageBackground } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
 export default function App() {
@@ -19,10 +19,38 @@ export default function App() {
 
         {/* Main Content */}
         <View style={styles.content}>
-          <View style={styles.card}></View>
-          <View style={styles.card}></View>
-          <View style={styles.card}></View>
-          <View style={styles.card}></View>
+          <View style={styles.card}>
+            <ImageBackground
+              source={{ uri: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR6NE3aZizkVzc3aC_3pc_Z4hbcyioOX3DvDg&s" }}
+              style={styles.cardBackground}
+              resizeMode="cover" // or "contain", "stretch"
+            >
+            </ImageBackground>
+          </View>
+          <View style={styles.card}>
+            <ImageBackground
+              source={{ uri: "https://eu-images.contentstack.com/v3/assets/blt58a1f8f560a1ab0e/blt24cd9acf50473f4c/671be76580eaf57d221bec23/7_eleven_inc_logo_1800-945.jpg?width=1280&auto=webp&quality=80&disable=upscale" }}
+              style={styles.cardBackground}
+              resizeMode="cover" // or "contain", "stretch"
+            >
+            </ImageBackground>
+          </View>
+          <View style={styles.card}>
+            <ImageBackground
+              source={{ uri: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQH7exCo5qyRiwg4g3zOCT0jholwceMjDLgBg&s" }}
+              style={styles.cardBackground}
+              resizeMode="cover" // or "contain", "stretch"
+            >
+            </ImageBackground>
+          </View>
+          <View style={styles.card}>
+            <ImageBackground
+              source={{ uri: "https://cdn.mos.cms.futurecdn.net/5StAbRHLA4ZdyzQZVivm2c.jpg" }}
+              style={styles.cardBackground}
+              resizeMode="cover" // or "contain", "stretch"
+            >
+            </ImageBackground>
+          </View>
         </View>
 
         {/* Bottom Tab Bar */}
@@ -89,4 +117,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 10,
   },
+  cardBackground: {
+    flex: 1
+  }
 });
