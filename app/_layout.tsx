@@ -1,44 +1,46 @@
 import { FontAwesome5, Ionicons, MaterialIcons } from '@expo/vector-icons';
 import React from 'react';
 import { StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
 export default function App() {
   return (
-    <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
-      <StatusBar barStyle="dark-content" backgroundColor="#f8f8f8" />
+    <SafeAreaProvider>
+      <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
+        <StatusBar barStyle="dark-content" backgroundColor="#f8f8f8" />
 
-      {/* Header */}
-      <View style={styles.header}>
-        <View style={styles.profileCircle}>
-          <Text style={styles.profileInitials}>JD</Text>
+        {/* Header */}
+        <View style={styles.header}>
+          <View style={styles.profileCircle}>
+            <Text style={styles.profileInitials}>JD</Text>
+          </View>
+          <Text style={styles.headerTitle}>My Rewards</Text>
         </View>
-        <Text style={styles.headerTitle}>My Rewards</Text>
-      </View>
 
-      {/* Main Content */}
-      <View style={styles.content}>
-        <Text style={{ fontSize: 18 }}>Welcome to your rewards</Text>
-      </View>
+        {/* Main Content */}
+        <View style={styles.content}>
+          <Text style={{ fontSize: 18 }}>Welcome to your rewards</Text>
+        </View>
 
-      {/* Bottom Tab Bar */}
-      <View style={styles.tabBar}>
-        <TouchableOpacity style={styles.tabItem}>
-          <MaterialIcons name="card-giftcard" size={24} color="#007AFF" />
-          <Text style={{ color: '#007AFF' }}>My Rewards</Text>
-        </TouchableOpacity>
+        {/* Bottom Tab Bar */}
+        <View style={styles.tabBar}>
+          <TouchableOpacity style={styles.tabItem}>
+            <MaterialIcons name="card-giftcard" size={24} color="#007AFF" />
+            <Text style={{ color: '#007AFF' }}>My Rewards</Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity style={styles.tabItem}>
-          <FontAwesome5 name="qrcode" size={24} color="gray" />
-          <Text style={{ color: 'gray' }}>Scan</Text>
-        </TouchableOpacity>
+          <TouchableOpacity style={styles.tabItem}>
+            <FontAwesome5 name="qrcode" size={24} color="gray" />
+            <Text style={{ color: 'gray' }}>Scan</Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity style={styles.tabItem}>
-          <Ionicons name="settings-outline" size={24} color="gray" />
-          <Text style={{ color: 'gray' }}>Settings</Text>
-        </TouchableOpacity>
-      </View>
-    </SafeAreaView>
+          <TouchableOpacity style={styles.tabItem}>
+            <Ionicons name="settings-outline" size={24} color="gray" />
+            <Text style={{ color: 'gray' }}>Settings</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    </SafeAreaProvider>
   );
 }
 
@@ -71,8 +73,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   tabItem: {
-    flex: 1,              // take equal width (33%)
-    alignItems: 'center', // center icons and text
+    flex: 1,
+    alignItems: 'center',
     paddingVertical: 10,
   },
 });
