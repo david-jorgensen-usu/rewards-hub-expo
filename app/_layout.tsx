@@ -1,123 +1,36 @@
-import { FontAwesome5, Ionicons, MaterialIcons } from '@expo/vector-icons';
-import React from 'react';
-import { ImageBackground, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { FontAwesome5, Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { Tabs } from "expo-router";
 
-export default function App() {
+export default function Layout() {
   return (
-    <SafeAreaProvider>
-      <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
-        <StatusBar barStyle="dark-content" backgroundColor="#f8f8f8" />
-
-        {/* Header */}
-        <View style={styles.header}>
-          <View style={styles.profileCircle}>
-            <Text style={styles.profileInitials}>JD</Text>
-          </View>
-          <Text style={styles.headerTitle}>My Rewards</Text>
-        </View>
-
-        {/* Main Content */}
-        <View style={styles.content}>
-          <View style={styles.card}>
-            <ImageBackground
-              source={{ uri: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR6NE3aZizkVzc3aC_3pc_Z4hbcyioOX3DvDg&s" }}
-              style={styles.cardBackground}
-              resizeMode="cover" // or "contain", "stretch"
-            >
-            </ImageBackground>
-          </View>
-          <View style={styles.card}>
-            <ImageBackground
-              source={{ uri: "https://eu-images.contentstack.com/v3/assets/blt58a1f8f560a1ab0e/blt24cd9acf50473f4c/671be76580eaf57d221bec23/7_eleven_inc_logo_1800-945.jpg?width=1280&auto=webp&quality=80&disable=upscale" }}
-              style={styles.cardBackground}
-              resizeMode="cover" // or "contain", "stretch"
-            >
-            </ImageBackground>
-          </View>
-          <View style={styles.card}>
-            <ImageBackground
-              source={{ uri: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQH7exCo5qyRiwg4g3zOCT0jholwceMjDLgBg&s" }}
-              style={styles.cardBackground}
-              resizeMode="cover" // or "contain", "stretch"
-            >
-            </ImageBackground>
-          </View>
-          <View style={styles.card}>
-            <ImageBackground
-              source={{ uri: "https://cdn.mos.cms.futurecdn.net/5StAbRHLA4ZdyzQZVivm2c.jpg" }}
-              style={styles.cardBackground}
-              resizeMode="cover" // or "contain", "stretch"
-            >
-            </ImageBackground>
-          </View>
-        </View>
-
-        {/* Bottom Tab Bar */}
-        <View style={styles.tabBar}>
-          <TouchableOpacity style={styles.tabItem}>
-            <MaterialIcons name="card-giftcard" size={24} color="#007AFF" />
-            <Text style={{ color: '#007AFF' }}>My Rewards</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.tabItem}>
-            <FontAwesome5 name="qrcode" size={24} color="gray" />
-            <Text style={{ color: 'gray' }}>Scan</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.tabItem}>
-            <Ionicons name="settings-outline" size={24} color="gray" />
-            <Text style={{ color: 'gray' }}>Settings</Text>
-          </TouchableOpacity>
-        </View>
-      </SafeAreaView>
-    </SafeAreaProvider>
+    <Tabs screenOptions={{ headerShown: false }}>
+      <Tabs.Screen
+        name="index"
+        options={{
+          title: "My Rewards",
+          tabBarIcon: ({ color }) => (
+            <MaterialIcons name="card-giftcard" size={24} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="scan"
+        options={{
+          title: "Scan",
+          tabBarIcon: ({ color }) => (
+            <FontAwesome5 name="qrcode" size={24} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="settings"
+        options={{
+          title: "Settings",
+          tabBarIcon: ({ color }) => (
+            <Ionicons name="settings-outline" size={24} color={color} />
+          ),
+        }}
+      />
+    </Tabs>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff' },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: '#f8f8f8',
-    borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
-  },
-  profileCircle: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#007AFF',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  card: {width: "45%", height: 70, backgroundColor:'#f8f8f8', borderWidth:1, borderColor:'#ddd'},
-  profileInitials: { color: '#fff', fontWeight: 'bold' },
-  headerTitle: { fontSize: 20, fontWeight: 'bold', marginLeft: 12 },
-  content: { 
-    padding: 10, 
-    flex: 1, 
-    flexDirection:"row", 
-    flexWrap:"wrap", 
-    justifyContent: 'center', 
-    alignItems: 'flex-start',
-    alignContent: 'flex-start', 
-    gap: 20 },
-  tabBar: {
-    flexDirection: 'row',
-    borderTopWidth: 1,
-    borderTopColor: '#ddd',
-    backgroundColor: '#fff',
-  },
-  tabItem: {
-    flex: 1,
-    alignItems: 'center',
-    paddingVertical: 10,
-  },
-  cardBackground: {
-    flex: 1
-  }
-});
