@@ -1,5 +1,5 @@
-import { FontAwesome5, Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
+import { FontAwesome5, Ionicons, MaterialIcons } from "@expo/vector-icons";
 
 export default function Layout() {
   return (
@@ -30,6 +30,16 @@ export default function Layout() {
             <Ionicons name="settings-outline" size={24} color={color} />
           ),
         }}
+      />
+
+      {/* Hide modal and tabs folders from tab bar */}
+      <Tabs.Screen
+        name="modal"
+        options={{ href: null }}
+      />
+      <Tabs.Screen
+        name="tabs"
+        options={{ href: null }}
       />
     </Tabs>
   );
