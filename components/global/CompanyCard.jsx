@@ -5,7 +5,7 @@ export default function CompanyCard({ companyName, companyLogo, points }) {
         <View style={styles.card}>
             <ImageBackground source={{ uri: companyLogo }} style={styles.imageBackground}></ImageBackground>
             <View style={styles.infoContainer}>
-                <Text style={styles.points}>+{points} Points</Text>
+                <Text style={styles.points}>{points} Points</Text>
             </View>
         </View>
     );
@@ -13,7 +13,7 @@ export default function CompanyCard({ companyName, companyLogo, points }) {
 
 const styles = StyleSheet.create({
     card: {
-        width: '30%',
+        width: '31%',
         backgroundColor: '#f8f8f8',
         borderRadius: 10,
         overflow: 'hidden',
@@ -30,11 +30,12 @@ const styles = StyleSheet.create({
     infoContainer: {
         flexDirection: 'column',
         justifyContent: 'space-between',
-        backgroundColor: '#eeeeeeff',
+        backgroundColor: '#eef5ffff',
         padding: 10,
     },
     points: {
         fontStyle: 'italic',
         fontSize: 14,
+        color: '#7c7c7cff',
     },
 });

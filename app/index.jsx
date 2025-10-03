@@ -1,5 +1,5 @@
 import { router } from "expo-router";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import CardGallery from "../components/global/CardGallery";
 import CompanyCard from "../components/global/CompanyCard";
 import HeroSection from "../components/index/HeroSection";
@@ -15,7 +15,8 @@ export default function Index() {
           router.push('/rewards'); 
         }}
       />
-      <CardGallery galleryTitle="Recent Rewards">
+      <Text style={styles.recentRewardsTitle}>Recent Entries</Text>
+      <CardGallery>
         <CompanyCard
           companyLogo="https://cdn.prod.website-files.com/659a9ef71c962485037fcc8f/65ed11b9d9252c7b9cd65ec1_Starbucks-logo.webp"
           points={300}
@@ -75,5 +76,13 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     alignItems: 'center',
     backgroundColor: '#fff',
+  },
+  recentRewardsTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    alignSelf: 'flex-start',
+    paddingLeft: 20,
+    marginTop: 20,
+    marginBottom: 10,
   },
 });
