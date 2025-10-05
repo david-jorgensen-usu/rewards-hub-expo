@@ -1,5 +1,6 @@
 import Entypo from '@expo/vector-icons/Entypo';
 import Feather from '@expo/vector-icons/Feather';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
@@ -14,7 +15,7 @@ export default function Profile() {
   return (
     <View style={styles.container}>
       <LinearGradient
-        colors={["#c1dcffff", "#ffffff"]}
+        colors={["#f9b145", "#ffffff"]}
         start={{ x: 0.5, y: 0 }}
         end={{ x: 0.5, y: 1 }}
         style={styles.heroContainer}
@@ -85,6 +86,20 @@ export default function Profile() {
           subtitle="Remove your account permanently"
           onPress={() => navigate('profile/delete')}
         />
+
+        <OptionButton
+          icon={<MaterialCommunityIcons name="restart" size={24} color="black" />}
+          title="TESTING: Signup Page"
+          subtitle="Visit the signup page"
+          onPress={() => navigate('signup')}
+        />
+
+        <OptionButton
+          icon={<MaterialCommunityIcons name="restart" size={24} color="black" />}
+          title="TESTING: Signin Page"
+          subtitle="Visit the signin page"
+          onPress={() => navigate('signin')}
+        />
       </ScrollView>
     </View>
   );
@@ -128,7 +143,7 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     marginBottom: 10,
     borderWidth: 3,
-    borderColor: '#eef5ffff',
+    borderColor: '#ffeed3ff',
   },
   userName: {
     fontSize: 24,
@@ -162,7 +177,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: '90%',
     paddingVertical: 20,
-    backgroundColor: '#eef5ffff',
+    backgroundColor: '#ffeed3ff',
     borderRadius: 20,
     marginBottom: 20,
   },
@@ -197,7 +212,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 15,
     borderRadius: 20,
-    backgroundColor: '#eef5ffff',
+    backgroundColor: '#ffeed3ff',
     marginBottom: 15,
   },
   userOptionTextButton: {

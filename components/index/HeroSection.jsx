@@ -4,7 +4,7 @@ import { TouchableOpacity, StyleSheet, Text } from "react-native";
 export default function HeroSection({ title, subtitle, buttonText, onButtonPress }) {
   return (
     <LinearGradient
-        colors={["#c1dcffff", "#ffffff"]} // gradient colors
+        colors={["#f9b145", "#ffffff"]} // gradient colors
         start={{ x: 0.5, y: 0 }} // top-left
         end={{ x: 0.5, y: 1 }}   // bottom-right
         style={styles.container}
@@ -44,7 +44,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingVertical: 10,
     paddingHorizontal: 20,
-    backgroundColor: '#007bff',
+    backgroundColor: '#f9b145',
   },
   buttonText: {
     color: '#fff',

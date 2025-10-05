@@ -9,7 +9,7 @@ export default function Rewards() {
     return (
         <View style={styles.container}>
             <LinearGradient
-                colors={["#c1dcffff", "#ffffff"]} // gradient colors
+                colors={["#f9b145", "#ffffff"]} // gradient colors
                 start={{ x: 0.5, y: 0 }} // top-left
                 end={{ x: 0.5, y: 1 }}   // bottom-right
                 style={styles.heroContainer}
@@ -102,7 +102,7 @@ const styles = StyleSheet.create({
         paddingVertical: 8,
         paddingHorizontal: 16,
         marginBottom: 10,
-        backgroundColor: '#007bff',
+        backgroundColor: '#f9b145',
         height: 36,
         flexDirection: 'row',
     },

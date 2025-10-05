@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
     infoContainer: {
         flexDirection: 'column',
         justifyContent: 'space-between',
-        backgroundColor: '#eef5ffff',
+        backgroundColor: '#ffeed3ff',
         padding: 10,
     },
     points: {
