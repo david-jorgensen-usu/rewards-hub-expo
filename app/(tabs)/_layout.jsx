@@ -22,6 +22,7 @@ export default function Layout() {
         options={{ 
           title: "Rewards",
           tabBarLabel: "Rewards",
+          unmountOnBlur: true,
           tabBarIcon: ({ color, size}) => (
             <Ionicons name="gift-outline" size={size} color={color} />
           )
