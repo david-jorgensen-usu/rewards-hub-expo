@@ -5,13 +5,12 @@ import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
   ImageBackground,
-  SafeAreaView,
   ScrollView,
   StatusBar,
   StyleSheet,
   Text,
   TouchableOpacity,
-  View,
+  View
 } from 'react-native';
 
 export default function RewardsPage() {
@@ -32,7 +31,7 @@ export default function RewardsPage() {
 
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <StatusBar barStyle="dark-content" />
       <LinearGradient
         colors={['#fef3c7', '#fed7aa', '#fef3c7']}
@@ -148,7 +147,7 @@ export default function RewardsPage() {
         </ScrollView>
 
       </LinearGradient>
-    </SafeAreaView>
+    </View>
   );
 }
 
