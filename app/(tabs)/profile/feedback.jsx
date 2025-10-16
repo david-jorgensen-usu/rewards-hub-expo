@@ -1,28 +1,140 @@
-import { View, Text, StyleSheet, Button, Alert } from "react-native";
+import { Ionicons } from '@expo/vector-icons';
+import React, { useState } from 'react';
+import { KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 export default function FeedbackPage() {
-  const fetchMessage = async () => {
+  const [feedback, setFeedback] = useState('');
+  const [status, setStatus] = useState(null);
+
+  const sendFeedback = async () => {
+    if (!feedback.trim()) {
+      setStatus('Please enter some feedback first.');
+      return;
+    }
+
     try {
-      const response = await fetch("https://rewardshub.online/test-api/");
+      const response = await fetch('https://rewardshub.online/feedback/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ feedback }),
+      });
+
       const data = await response.json();
-      Alert.alert("Message from server", data.message);
+
+      if (response.ok) {
+        setStatus('✅ Feedback sent successfully!');
+        setFeedback('');
+      } else {
+        setStatus(`❌ Error: ${data.message || 'Failed to send feedback.'}`);
+      }
     } catch (error) {
-      Alert.alert("Error", error.message);
+      setStatus(`❌ Network error: ${error.message}`);
     }
   };
 
   return (
-    <View style={styles.container}>
-      <Text>Feedback</Text>
-      <Button title="Test Server Connection" onPress={fetchMessage} />
-    </View>
+    <KeyboardAvoidingView 
+      style={styles.container}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    >
+      <View style={styles.header}>
+        <Text style={styles.title}>Feedback</Text>
+        <Text style={styles.subtitle}>
+          Tell us what you think! 🧡
+        </Text>
+      </View>
+
+      <View style={styles.form}>
+        <View style={styles.inputContainer}>
+          <Ionicons name="chatbubble-outline" size={22} color="#F97316" style={styles.icon} />
+          <TextInput
+            style={styles.input}
+            placeholder="Type your feedback here..."
+            placeholderTextColor="#9CA3AF"
+            value={feedback}
+            onChangeText={setFeedback}
+            multiline
+          />
+        </View>
+
+        <TouchableOpacity style={styles.button} onPress={sendFeedback}>
+          <Text style={styles.buttonText}>Send Feedback</Text>
+        </TouchableOpacity>
+
+        {status && <Text style={styles.status}>{status}</Text>}
+      </View>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+    backgroundColor: '#FFF7ED',
+    padding: 20,
+  },
+  header: {
+    marginTop: 40,
+    marginBottom: 20,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#111827',
+  },
+  subtitle: {
+    fontSize: 16,
+    color: '#6B7280',
+    marginTop: 4,
+  },
+  form: {
+    marginTop: 20,
+  },
+  inputContainer: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 2,
+    marginBottom: 20,
+  },
+  icon: {
+    marginRight: 8,
+    marginTop: 4,
+  },
+  input: {
+    flex: 1,
+    fontSize: 16,
+    color: '#111827',
+    minHeight: 80,
+    textAlignVertical: 'top',
+  },
+  button: {
+    backgroundColor: '#F97316',
+    paddingVertical: 14,
+    borderRadius: 16,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  buttonText: {
+    color: '#FFFFFF',
+    fontWeight: '600',
+    fontSize: 16,
+  },
+  status: {
+    marginTop: 16,
+    fontSize: 14,
+    color: '#6B7280',
+    textAlign: 'center',
   },
 });
