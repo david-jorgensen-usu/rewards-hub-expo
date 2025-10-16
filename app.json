@@ -13,7 +13,16 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/icons/rewardshub-icon.png",
         "backgroundColor": "#ffffff"
+      },
+      "package": "com.rewardshubonline.rewardshub"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "ee9e03d6-b71f-44b6-abfc-f9c7f5e7d664"
       }
-    }
+    },
+    "plugins": [
+      "expo-secure-store"
+    ]
   }
 }

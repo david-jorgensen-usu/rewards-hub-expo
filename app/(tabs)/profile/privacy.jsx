@@ -3,28 +3,46 @@ import * as Notifications from 'expo-notifications';
 import React, { useEffect } from 'react';
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-export default function PrivacyPage() {
+// ✅ Ensure notifications display even while app is open
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: false,
+  }),
+});
 
+export default function PrivacyPage() {
   useEffect(() => {
-    // Request notification permissions
+    // Request notification permission when page loads
     const requestPermissions = async () => {
       const { status } = await Notifications.requestPermissionsAsync();
       if (status !== 'granted') {
-        Alert.alert('Permission required', 'Please enable notifications to test.');
+        Alert.alert(
+          'Permission required',
+          'Please enable notifications to test this feature.'
+        );
       }
     };
+
     requestPermissions();
   }, []);
 
+  // 🚀 Trigger a local test notification
   const triggerNotification = async () => {
-    await Notifications.scheduleNotificationAsync({
-      content: {
-        title: "🐱 Rhemi says hi!",
-        body: "This is your test notification from RewardsHub 🎉",
-        sound: true,
-      },
-      trigger: null, // triggers immediately
-    });
+    try {
+      await Notifications.scheduleNotificationAsync({
+        content: {
+          title: '🐱 Rhemi says hi!',
+          body: 'This is your test notification from RewardsHub 🎉',
+          sound: true,
+        },
+        trigger: null, // null = fire immediately
+      });
+    } catch (error) {
+      console.error('Error sending notification:', error);
+      Alert.alert('Error', 'Could not send notification.');
+    }
   };
 
   return (
@@ -44,6 +62,7 @@ export default function PrivacyPage() {
   );
 }
 
+// 🎨 Styles
 const styles = StyleSheet.create({
   container: {
     flex: 1,

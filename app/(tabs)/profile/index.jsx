@@ -99,7 +99,10 @@ export default function ProfileScreen() {
             <Feather name="chevron-right" size={20} color="#9ca3af" />
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.menuCard}>
+          <TouchableOpacity 
+            style={styles.menuCard}
+            onPress={() => router.push('/profile/edit')}
+          >
             <View style={styles.menuContent}>
               <View style={[styles.iconCircle, styles.iconGreen]}>
                 <Feather name="edit" size={20} color="#16a34a" />
