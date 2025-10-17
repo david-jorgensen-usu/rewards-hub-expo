@@ -1,90 +1,187 @@
 import { useRouter } from 'expo-router';
-import React from 'react';
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React, { useState } from 'react';
+import {
+  Alert,
+  Image,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View
+} from 'react-native';
 
 export default function SignupPage() {
   const router = useRouter();
   const navigate = (page) => router.push(page);
-  
+
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  const handleSignUp = async () => {
+    try {
+      const response = await fetch("https://rewardshub.online/registration/sign-up/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          first_name: firstName,
+          last_name: lastName,
+          email: email,
+          password: password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        Alert.alert("✅ Success", "Account created successfully!");
+        console.log("User:", data);
+        router.replace("/signin"); // or /home if you want
+      } else {
+        Alert.alert("❌ Error", data.error || "Signup failed.");
+      }
+    } catch (error) {
+      console.error("Signup error:", error);
+      Alert.alert("⚠️ Network Error", "Could not connect to server.");
+    }
+  };
+
   return (
-    <View style={styles.container}>
-      <Image
-        source={require('@/assets/rewardsHubLogos/rewardshub.png')}
-        style={styles.welcomeImage}
-        resizeMode='contain'
-      />
-      <Text style={styles.welcomeText}>Welcome, new friend!</Text>
-      <View style={styles.oauthContainer}>
-        <TouchableOpacity style={styles.oauthButton}>
-          <Image source={require('@/assets/oauthLogos/google.png')} style={styles.oauthIcon} />
-          <Text style={styles.oauthText}>Sign up with Google</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.oauthButton}>
-          <Image source={require('@/assets/oauthLogos/apple.png')} style={styles.oauthIcon} />
-          <Text style={styles.oauthText}>Sign up with Apple</Text>
-        </TouchableOpacity>
-        <TouchableOpacity 
-          style={styles.createAccountButton}
-          onPress={() => {
-            navigate('signin');
-          }}
-        >
-          <Text style={styles.createAccountText}>Have an account? Sign in</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
+    <KeyboardAvoidingView
+      style={{ flex: 1, backgroundColor: '#fff' }}
+      behavior="padding"
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 20}
+    >
+      <ScrollView
+        contentContainerStyle={styles.scrollContainer}
+        keyboardShouldPersistTaps="handled"
+      >
+        <View style={styles.container}>
+          <Image
+            source={require('@/assets/rewardsHubLogos/rewardshub.png')}
+            style={styles.welcomeImage}
+            resizeMode="contain"
+          />
+          <Text style={styles.welcomeText}>Welcome, new friend!</Text>
+
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={styles.input}
+              placeholder="First Name"
+              placeholderTextColor="#8c8c8c"
+              value={firstName}
+              onChangeText={setFirstName}
+              autoCapitalize="words"
+            />
+
+            <TextInput
+              style={styles.input}
+              placeholder="Last Name"
+              placeholderTextColor="#8c8c8c"
+              value={lastName}
+              onChangeText={setLastName}
+              autoCapitalize="words"
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Email"
+              placeholderTextColor="#8c8c8c"
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
+              autoCapitalize="none"
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Password"
+              placeholderTextColor="#8c8c8c"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry
+            />
+
+            <TouchableOpacity style={styles.signUpButton} onPress={handleSignUp}>
+              <Text style={styles.signUpText}>Sign Up</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.createAccountButton}
+              onPress={() => navigate('signin')}
+            >
+              <Text style={styles.createAccountText}>
+                Have an account? Sign in
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
-    welcomeText: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        textAlign: 'center',
-        marginTop: 20,
-        color: '#4e2a14',
-    },
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#fff',
-        padding: 20,
-    },
-    welcomeImage: {
-        height: 300,
-        width: 300,
-    },
-    oauthContainer: {
-        flexDirection: 'column',
-        justifyContent: 'space-around',
-        gap: 10,
-        marginTop: 20,
-    },
-    oauthButton: {
-        padding: 10,
-        backgroundColor: '#eef5ffff',
-        flexDirection: 'row',
-        borderRadius: 5,
-        justifyContent: 'center',
-        alignItems: 'center',
-        width: 250,
-        backgroundColor: '#f9b145',
-    },
-    oauthIcon: {
-        width: 20,
-        height: 20,
-        marginRight: 10,
-    },
-    oauthText: {
-        fontSize: 20,
-        fontWeight: '500',
-        color: '#4e2a14',
-    },
-    createAccountText: {
-        fontSize: 16,
-        fontWeight: '500',
-        color: '#4e2a14',
-        textAlign: 'center',
-    },
+  scrollContainer: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#fff', // prevents gray bar
+  },
+  container: {
+    alignItems: 'center',
+    padding: 20,
+  },
+  welcomeImage: {
+    height: 300,
+    width: 300,
+  },
+  welcomeText: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginTop: 20,
+    color: '#4e2a14',
+  },
+  inputContainer: {
+    marginTop: 30,
+    width: '100%',
+    alignItems: 'center',
+    gap: 15,
+  },
+  input: {
+    width: 250,
+    borderWidth: 1,
+    borderColor: '#f9b145',
+    borderRadius: 8,
+    padding: 10,
+    fontSize: 16,
+    color: '#4e2a14',
+  },
+  signUpButton: {
+    backgroundColor: '#f9b145',
+    borderRadius: 8,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    width: 250,
+    alignItems: 'center',
+  },
+  signUpText: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#4e2a14',
+  },
+  createAccountButton: {
+    marginTop: 10,
+  },
+  createAccountText: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#4e2a14',
+    textAlign: 'center',
+  },
 });
