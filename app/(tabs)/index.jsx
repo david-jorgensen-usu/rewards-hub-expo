@@ -1,8 +1,9 @@
 import { recentEntries } from '@/data/recentEntries';
 import { rewards } from '@/data/rewardsData';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   ImageBackground,
   ScrollView,
@@ -13,8 +14,10 @@ import {
   View
 } from 'react-native';
 
-export default function RewardsPage() {
+export default function HomePage() {
   const router = useRouter();
+  const [user, setUser] = useState(null);
+  const [firstName, setFirstName] = useState("");
   const [points] = useState(1250);
 
   const nextMilestone = 2000;
@@ -22,93 +25,90 @@ export default function RewardsPage() {
 
   const mergedEntries = recentEntries.map(entry => {
     const reward = rewards.find(r => r.reference === entry.brand);
-
-    return {
-      ...entry,          // keep all entry fields
-      ...(reward || {}), // flatten all reward fields if found
-    };
+    return { ...entry, ...(reward || {}) };
   });
+
+  const refreshToken = async () => {
+    const refresh = await AsyncStorage.getItem("refreshToken");
+    if (!refresh) return null;
+
+    try {
+      const response = await fetch("https://rewardshub.online/api/token/refresh/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ refresh }),
+      });
+      const data = await response.json();
+      if (response.ok && data.access) {
+        await AsyncStorage.setItem("accessToken", data.access);
+        console.log("✅ Access token refreshed");
+        return data.access;
+      } else {
+        console.warn("⚠️ Failed to refresh token:", data);
+        return null;
+      }
+    } catch (err) {
+      console.error("Error refreshing token:", err);
+      return null;
+    }
+  };
+
+  const fetchUser = async () => {
+    try {
+      let token = await AsyncStorage.getItem("accessToken");
+      if (!token) return;
+
+      const response = await fetch("https://rewardshub.online/api/user/", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      const text = await response.text();
+      console.log("Raw response:", text);
+
+      const data = JSON.parse(text);
+
+      if (!response.ok && data.code === "token_not_valid") {
+        console.log("🔁 Token expired, refreshing...");
+        token = await refreshToken();
+        if (token) return fetchUser(); // retry once
+        return;
+      }
+
+      if (response.ok) {
+        setUser(data);
+        if (data.first_name) setFirstName(data.first_name);
+      } else {
+        console.warn("⚠️ Server returned error:", data);
+      }
+    } catch (err) {
+      console.error("Error fetching user:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchUser();
+  }, []);
 
 
   return (
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" />
       <LinearGradient
-        colors={['#fef3c7', '#fed7aa', '#fef3c7']}
+        colors={['#FFF7ED', '#FFF7ED', '#FFF7ED']}
         style={styles.gradient}
       >
         <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
           {/* Header */}
           <View style={styles.header}>
             <View style={styles.headerContent}>
-              <Text style={styles.greeting}>Hi John! 👋</Text>
-              <View style={styles.badge}>
-                <Text style={styles.badgeIcon}>🏆</Text>
-              </View>
+              <Text style={styles.greeting}>Hi {firstName || "there"}! 👋</Text>
             </View>
-          </View>
-
-          {/* Points Card */}
-          <View style={styles.cardContainer}>
-            <LinearGradient
-              colors={['#f59e0b', '#ea580c']}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={styles.pointsCard}
-            >
-              <View style={styles.pointsHeader}>
-                <View>
-                  <Text style={styles.pointsLabel}>Total Points</Text>
-                  <Text style={styles.pointsValue}>
-                    {points.toLocaleString()}
-                  </Text>
-                </View>
-                <Text style={styles.starIcon}>⭐</Text>
-              </View>
-
-              {/* Progress Bar */}
-              <View style={styles.progressContainer}>
-                <View style={styles.progressHeader}>
-                  <Text style={styles.progressLabel}>
-                    📈 Next milestone
-                  </Text>
-                  <Text style={styles.progressTarget}>
-                    {nextMilestone.toLocaleString()}
-                  </Text>
-                </View>
-                <View style={styles.progressBarBg}>
-                  <View
-                    style={[
-                      styles.progressBarFill,
-                      { width: `${progress}%` },
-                    ]}
-                  />
-                </View>
-                <Text style={styles.progressText}>
-                  {nextMilestone - points} points to go!
-                </Text>
-              </View>
-
-              {/* CTA Button */}
-              <TouchableOpacity 
-                style={styles.exploreButton} 
-                activeOpacity={0.8}
-                onPress={() => router.replace('/rewards')}
-              >
-                <Text style={styles.exploreButtonText}>
-                  🎁 Explore Rewards
-                </Text>
-              </TouchableOpacity>
-            </LinearGradient>
           </View>
 
           {/* Recent Entries */}
           <View style={styles.recentSection}>
             <View style={styles.recentHeader}>
               <Text style={styles.recentTitle}>Recent Activity</Text>
-              <TouchableOpacity>
-                <Text style={styles.viewAllText}>View All</Text>
-              </TouchableOpacity>
             </View>
 
             {/* Entries List */}
@@ -133,10 +133,6 @@ export default function RewardsPage() {
                         <Text style={styles.entryDate}>{entry.date}</Text>
                       </View>
                     </View>
-                    <View style={styles.entryRight}>
-                      <Text style={styles.entryPoints}>+{entry.points}</Text>
-                      <Text style={styles.pointsSmallLabel}>points</Text>
-                    </View>
                   </View>
                 </TouchableOpacity>
               ))}
@@ -154,7 +150,7 @@ export default function RewardsPage() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fef3c7',
+    backgroundColor: '#FFF7ED',
   },
   gradient: {
     flex: 1,
@@ -299,13 +295,12 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   entriesList: {
-    gap: 12,
+    gap: 15,
   },
   entryCard: {
     backgroundColor: '#ffffff',
     borderRadius: 16,
     padding: 16,
-    marginBottom: 12,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,

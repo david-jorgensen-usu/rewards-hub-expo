@@ -5,6 +5,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams } from 'expo-router';
 import React from 'react';
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 
 export default function CafeZupasApp() {
   const params = useLocalSearchParams();
@@ -27,44 +28,6 @@ export default function CafeZupasApp() {
         >
           <View style={styles.headerTop}>
             <Text style={styles.headerTitle}>{displayName}</Text>
-            <View style={styles.bellButton}>
-              <Ionicons name="notifications-outline" size={22} color="white" />
-            </View>
-          </View>
-          
-          {/* Points Card */}
-          <View style={styles.pointsCard}>
-            <View style={styles.pointsContent}>
-              <View style={styles.pointsLeft}>
-                <Text style={styles.balanceLabel}>Your Balance</Text>
-                <View style={styles.pointsRow}>
-                  <Text style={styles.pointsNumber}>{reward ? reward.points : 0}</Text>
-                  <Text style={styles.pointsText}>points</Text>
-                </View>
-              </View>
-              <LinearGradient
-                colors={['#fbbf24', '#f59e0b']}
-                style={styles.awardBadge}
-              >
-                <Ionicons name="trophy" size={32} color="white" />
-              </LinearGradient>
-            </View>
-            
-            {/* Progress Bar */}
-            <View style={styles.progressSection}>
-              <View style={styles.progressHeader}>
-                <Text style={styles.progressText}>Next reward in 150 points</Text>
-                <Text style={styles.progressPercent}>40%</Text>
-              </View>
-              <View style={styles.progressBarBg}>
-                <LinearGradient
-                  colors={['#3b82f6', '#2563eb']}
-                  style={styles.progressBarFill}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 0 }}
-                />
-              </View>
-            </View>
           </View>
         </LinearGradient>
 
@@ -81,11 +44,10 @@ export default function CafeZupasApp() {
                 <Ionicons name="notifications" size={20} color="white" />
               </View>
               <View>
-                <Text style={styles.statusTitle}>Rewards Active</Text>
-                <Text style={styles.statusSubtitle}>Earning points on every purchase</Text>
+                <Text style={styles.statusTitle}>Location Alerts Active</Text>
+                <Text style={styles.statusSubtitle}>Get an alert when you're near a store.</Text>
               </View>
             </View>
-            <Ionicons name="chevron-forward" size={20} color="white" />
           </LinearGradient>
         </View>
 
@@ -98,10 +60,9 @@ export default function CafeZupasApp() {
                 colors={['#3b82f6', '#2563eb']}
                 style={styles.actionIcon}
               >
-                <Ionicons name="cafe" size={24} color="white" />
+                <MaterialCommunityIcons name="web" size={24} color="white" />
               </LinearGradient>
-              <Text style={styles.actionTitle}>Order Now</Text>
-              <Text style={styles.actionSubtitle}>Start earning points</Text>
+              <Text style={styles.actionTitle}>Visit Website</Text>
             </TouchableOpacity>
             
             <TouchableOpacity style={styles.actionCard}>
@@ -109,10 +70,9 @@ export default function CafeZupasApp() {
                 colors={['#fbbf24', '#f59e0b']}
                 style={styles.actionIcon}
               >
-                <Ionicons name="gift" size={24} color="white" />
+                <Ionicons name="open-outline" size={24} color="white" />
               </LinearGradient>
-              <Text style={styles.actionTitle}>Redeem</Text>
-              <Text style={styles.actionSubtitle}>Use your points</Text>
+              <Text style={styles.actionTitle}>Open App</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -121,22 +81,10 @@ export default function CafeZupasApp() {
         <View style={[styles.section, { marginBottom: 100 }]}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Recent Activity</Text>
-            <TouchableOpacity>
-              <Text style={styles.viewAllText}>View All</Text>
-            </TouchableOpacity>
           </View>
           
           {/* Empty State */}
-          <LinearGradient
-            colors={['#eff6ff', '#dbeafe']}
-            style={styles.emptyState}
-          >
-            <View style={styles.emptyIcon}>
-              <Ionicons name="calendar-outline" size={32} color="#2563eb" />
-            </View>
-            <Text style={styles.emptyTitle}>No recent activity</Text>
-            <Text style={styles.emptySubtitle}>Your orders and rewards will appear here</Text>
-          </LinearGradient>
+          
         </View>
       </ScrollView>
 
@@ -147,7 +95,7 @@ export default function CafeZupasApp() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#ffffff',
+    backgroundColor: '#FFF7ED',
   },
   scrollView: {
     flex: 1,

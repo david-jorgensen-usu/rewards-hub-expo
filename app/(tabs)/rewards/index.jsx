@@ -29,101 +29,78 @@ export default function RewardsProgram() {
     .filter(r => r.name.toLowerCase().includes(searchQuery.toLowerCase()))
     .sort((a, b) => sortBy === 'points' ? b.points - a.points : a.name.localeCompare(b.name));
 
-  const totalPoints = rewards.reduce((sum, r) => sum + r.points, 0);
-
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <StatusBar barStyle="light-content" />
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-        {/* Header */}
-        <LinearGradient
-          colors={['#F97316', '#F59E0B']}
-          style={styles.header}
-        >
-          <View style={styles.headerTop}>
-            <Text style={styles.headerTitle}>Rewards</Text>
-          </View>
-
-          {/* Stats Card */}
-          <View style={styles.statsCard}> 
-            <View style={styles.statsHeader}>
-              <Text style={styles.statsLabel}>Available Points</Text>
-              <Text style={styles.sparkle}>✨</Text>
-            </View>
-            <Text style={styles.statsPoints}>{totalPoints.toLocaleString()}</Text>
-            <View style={styles.statsFooter}>
-              <Text style={styles.trendingIcon}>📈</Text>
-              <Text style={styles.statsActive}>15 active programs</Text>
+        {/* Header Container */}
+        <View style={styles.headerContainer}>
+          {/* Search Bar */}
+          <View style={styles.searchContainer}>
+            <View style={styles.searchBar}>
+              <Text style={styles.searchIcon}>🔍</Text>
+              <TextInput
+                style={styles.searchInput}
+                placeholder="Search rewards..."
+                placeholderTextColor="#9CA3AF"
+                value={searchQuery}
+                onChangeText={setSearchQuery}
+              />
             </View>
           </View>
-        </LinearGradient>
 
-        {/* Search Bar */}
-        <View style={styles.searchContainer}>
-          <View style={styles.searchBar}>
-            <Text style={styles.searchIcon}>🔍</Text>
-            <TextInput
-              style={styles.searchInput}
-              placeholder="Search rewards..."
-              placeholderTextColor="#9CA3AF"
-              value={searchQuery}
-              onChangeText={setSearchQuery}
-            />
-          </View>
-        </View>
+          {/* Filters */}
+          <View style={styles.filtersContainer}>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterScroll}>
+              {[
+                { id: 'all', label: 'All', icon: '🎁' },
+                { id: 'food', label: 'Food', icon: '🍔' },
+                { id: 'grocery', label: 'Grocery', icon: '🛒' },
+                { id: 'gas', label: 'Gas', icon: '⛽' },
+                { id: 'entertainment', label: 'Entertainment', icon: '🎬' },
+                { id: 'shopping', label: 'Shopping', icon: '🛍️' },
+              ].map(filter => (
+                <TouchableOpacity
+                  key={filter.id}
+                  onPress={() => setActiveFilter(filter.id)}
+                  style={[
+                    styles.filterButton,
+                    activeFilter === filter.id && styles.filterButtonActive
+                  ]}
+                >
+                  <Text style={[
+                    styles.filterText,
+                    activeFilter === filter.id && styles.filterTextActive
+                  ]}>
+                    {filter.icon} {filter.label}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
 
-        {/* Filters */}
-        <View style={styles.filtersContainer}>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterScroll}>
-            {[
-              { id: 'all', label: 'All', icon: '🎁' },
-              { id: 'food', label: 'Food', icon: '🍔' },
-              { id: 'grocery', label: 'Grocery', icon: '🛒' },
-              { id: 'gas', label: 'Gas', icon: '⛽' },
-              { id: 'entertainment', label: 'Entertainment', icon: '🎬' },
-              { id: 'shopping', label: 'Shopping', icon: '🛍️' },
-            ].map(filter => (
+            {/* Sort */}
+            <View style={styles.sortContainer}>
+              <Text style={styles.sortLabel}>Sort by:</Text>
               <TouchableOpacity
-                key={filter.id}
-                onPress={() => setActiveFilter(filter.id)}
-                style={[
-                  styles.filterButton,
-                  activeFilter === filter.id && styles.filterButtonActive
-                ]}
+                onPress={() => setSortBy('points')}
+                style={[styles.sortButton, sortBy === 'points' && styles.sortButtonActive]}
               >
-                <Text style={[
-                  styles.filterText,
-                  activeFilter === filter.id && styles.filterTextActive
-                ]}>
-                  {filter.icon} {filter.label}
+                <Text style={[styles.sortText, sortBy === 'points' && styles.sortTextActive]}>
+                  Points
                 </Text>
               </TouchableOpacity>
-            ))}
-          </ScrollView>
-
-          {/* Sort */}
-          <View style={styles.sortContainer}>
-            <Text style={styles.sortLabel}>Sort by:</Text>
-            <TouchableOpacity
-              onPress={() => setSortBy('points')}
-              style={[styles.sortButton, sortBy === 'points' && styles.sortButtonActive]}
-            >
-              <Text style={[styles.sortText, sortBy === 'points' && styles.sortTextActive]}>
-                Points
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => setSortBy('name')}
-              style={[styles.sortButton, sortBy === 'name' && styles.sortButtonActive]}
-            >
-              <Text style={[styles.sortText, sortBy === 'name' && styles.sortTextActive]}>
-                Name
-              </Text>
-            </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => setSortBy('name')}
+                style={[styles.sortButton, sortBy === 'name' && styles.sortButtonActive]}
+              >
+                <Text style={[styles.sortText, sortBy === 'name' && styles.sortTextActive]}>
+                  Name
+                </Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
-
+        <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {/* Rewards Grid */}
         <View style={styles.rewardsGrid}>
           {filteredRewards.map((reward, idx) => (
@@ -144,34 +121,20 @@ export default function RewardsProgram() {
                 <Text style={styles.rewardName} numberOfLines={1}>
                   {reward.name}
                 </Text>
-                <View style={styles.rewardPoints}>
-                  <Text style={styles.pointsValue}>{reward.points}</Text>
-                  <Text style={styles.pointsLabel}>pts</Text>
-                </View>
-                <View 
-                  style={styles.redeemButton}
-                >
-                  <LinearGradient
-                    colors={['#F97316', '#F59E0B']}
-                    style={styles.redeemGradient}
-                  >
-                    <Text style={styles.redeemText}>Redeem</Text>
-                  </LinearGradient>
-                </View>
               </View>
             </TouchableOpacity>
           ))}
         </View>
       </ScrollView>
     
-    </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FEF3C7',
+    backgroundColor: '#FFF7ED',
   },
   scrollView: {
     flex: 1,
@@ -185,12 +148,19 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 24,
   },
   headerTitle: {
     fontSize: 32,
     fontWeight: 'bold',
     color: '#FFFFFF',
+  },
+  headerContainer: {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: '#FFF7ED',
+    zIndex: 10,
   },
   statsCard: {
     backgroundColor: 'rgba(255, 255, 255, 0.95)',
@@ -237,7 +207,7 @@ const styles = StyleSheet.create({
   },
   searchContainer: {
     paddingHorizontal: 24,
-    marginTop: -16,
+    marginTop: 40,
     marginBottom: 16,
   },
   searchBar: {
@@ -246,7 +216,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderRadius: 12,
     paddingHorizontal: 16,
-    paddingVertical: 14,
+    paddingVertical: 8,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,

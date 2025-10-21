@@ -1,9 +1,10 @@
-import { View, Text, StyleSheet } from "react-native";
+import React from "react";
+import { StyleSheet, Text, View } from "react-native";
 
-export default function DeleteAccountPage() {
+export default function DeletePage() {
   return (
     <View style={styles.container}>
-      <Text>Delete Account</Text>
+      <Text style={styles.text}>Delete Account</Text>
     </View>
   );
 }
@@ -11,7 +12,13 @@ export default function DeleteAccountPage() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
+    backgroundColor: "#282c34",
     alignItems: "center",
+    justifyContent: "center",
+  },
+  text: {
+    color: "white",
+    fontSize: 24,
+    fontWeight: "bold",
   },
 });

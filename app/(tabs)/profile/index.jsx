@@ -1,10 +1,8 @@
-import {
-  Feather,
-  MaterialCommunityIcons
-} from '@expo/vector-icons';
+import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   ScrollView,
   StatusBar,
@@ -16,6 +14,90 @@ import {
 
 export default function ProfileScreen() {
   const router = useRouter();
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  // 🔁 Refresh token logic (your working version)
+  const refreshToken = async () => {
+    try {
+      const refresh = await AsyncStorage.getItem("refresh");
+      if (!refresh) {
+        console.warn("⚠️ No refresh token found");
+        return null;
+      }
+
+      const response = await fetch("https://rewardshub.online/api/token/refresh/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ refresh }),
+      });
+
+      const data = await response.json();
+      if (response.ok && data.access) {
+        await AsyncStorage.setItem("accessToken", data.access);
+        console.log("✅ Access token refreshed");
+        return data.access;
+      } else {
+        console.warn("⚠️ Failed to refresh token:", data);
+        return null;
+      }
+    } catch (err) {
+      console.error("Error refreshing token:", err);
+      return null;
+    }
+  };
+
+  // 👤 Fetch user profile
+  const fetchUser = async () => {
+    try {
+      let token = await AsyncStorage.getItem("accessToken");
+      if (!token) {
+        console.warn("⚠️ No access token found");
+        setLoading(false);
+        return;
+      }
+
+      const response = await fetch("https://rewardshub.online/api/user/", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      const text = await response.text();
+      console.log("Raw response:", text);
+
+      let data;
+      try {
+        data = JSON.parse(text);
+      } catch {
+        console.error("Response is not JSON");
+        setLoading(false);
+        return;
+      }
+
+      // Token expired — retry with new token
+      if (!response.ok && data.code === "token_not_valid") {
+        console.log("🔁 Token expired, refreshing...");
+        token = await refreshToken();
+        if (token) return fetchUser(); // retry once
+        setLoading(false);
+        return;
+      }
+
+      if (response.ok) {
+        console.log("✅ User data loaded:", data);
+        setUser(data);
+      } else {
+        console.warn("⚠️ Server returned error:", data);
+      }
+    } catch (err) {
+      console.error("Error fetching user:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchUser();
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -39,35 +121,21 @@ export default function ProfileScreen() {
                   <Feather name="user" size={48} color="#fff" />
                 </View>
               </View>
-              <View style={styles.statusDot} />
             </View>
 
-            <Text style={styles.name}>John Doe</Text>
-            <Text style={styles.email}>randomuserjohn25@gmail.com</Text>
+            <Text style={styles.name}>
+              {loading
+                ? "Loading..."
+                : [user?.first_name, user?.last_name].filter(Boolean).join(" ") || "Unknown"}
+            </Text>
+            <Text style={styles.email}>{!loading && user?.email}</Text>
           </View>
         </LinearGradient>
 
-        {/* Stats Card */}
-        <View style={styles.statsContainer}>
-          <View style={styles.statsCard}>
-            <View style={styles.statItem}>
-              <Text style={styles.statNumber}>14</Text>
-              <Text style={styles.statLabel}>Programs</Text>
-            </View>
-            <View style={[styles.statItem, styles.statItemBorder]}>
-              <Text style={[styles.statNumber, styles.statNumberOrange]}>200</Text>
-              <Text style={styles.statLabel}>Points</Text>
-            </View>
-            <View style={styles.statItem}>
-              <Text style={styles.statNumber}>15</Text>
-              <Text style={styles.statLabel}>Entries</Text>
-            </View>
-          </View>
-        </View>
 
         {/* Menu Items */}
         <View style={styles.menuContainer}>
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.menuCard}
             onPress={() => router.push('/profile/feedback')}
           >
@@ -83,7 +151,7 @@ export default function ProfileScreen() {
             <Feather name="chevron-right" size={20} color="#9ca3af" />
           </TouchableOpacity>
 
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.menuCard}
             onPress={() => router.push('/profile/privacy')}
           >
@@ -99,23 +167,10 @@ export default function ProfileScreen() {
             <Feather name="chevron-right" size={20} color="#9ca3af" />
           </TouchableOpacity>
 
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.menuCard}
-            onPress={() => router.push('/profile/edit')}
+            onPress={() => router.push('/profile/logout')}
           >
-            <View style={styles.menuContent}>
-              <View style={[styles.iconCircle, styles.iconGreen]}>
-                <Feather name="edit" size={20} color="#16a34a" />
-              </View>
-              <View style={styles.menuText}>
-                <Text style={styles.menuTitle}>Edit Profile</Text>
-                <Text style={styles.menuSubtitle}>Update your personal information</Text>
-              </View>
-            </View>
-            <Feather name="chevron-right" size={20} color="#9ca3af" />
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.menuCard}>
             <View style={styles.menuContent}>
               <View style={[styles.iconCircle, styles.iconRed]}>
                 <Feather name="log-out" size={20} color="#dc2626" />
@@ -128,33 +183,49 @@ export default function ProfileScreen() {
             <Feather name="chevron-right" size={20} color="#9ca3af" />
           </TouchableOpacity>
 
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.menuCard}
-            onPress={() => router.push('/signin')}
+            onPress={() => router.push('/profile/delete')}
           >
             <View style={styles.menuContent}>
-              <View style={[styles.iconCircle, styles.iconGray]}>
-                <MaterialCommunityIcons name="restart" size={20} color="gray" />
+              <View style={[styles.iconCircle, styles.iconRed]}>
+                <Feather name="trash-2" size={20} color="#dc2626" />
               </View>
               <View style={styles.menuText}>
-                <Text style={[styles.menuTitle, styles.menuTitleBlack]}>TESTING: Signin Page</Text>
-                <Text style={styles.menuSubtitle}>Sign in to your account</Text>
+                <Text style={[styles.menuTitle, styles.menuTitleRed]}>Delete Account</Text>
+                <Text style={styles.menuSubtitle}>Permanently delete your account</Text>
               </View>
             </View>
             <Feather name="chevron-right" size={20} color="#9ca3af" />
           </TouchableOpacity>
 
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.menuCard}
-            onPress={() => router.push('/signup')}
+            onPress={() => router.push('/profile/test_notifications')}
           >
             <View style={styles.menuContent}>
               <View style={[styles.iconCircle, styles.iconGray]}>
-                <MaterialCommunityIcons name="restart" size={20} color="gray" />
+                <Feather name="arrow-right-circle" size={20} color="#000000ff" />
               </View>
               <View style={styles.menuText}>
-                <Text style={[styles.menuTitle, styles.menuTitleBlack]}>TESTING: Signup Page</Text>
-                <Text style={styles.menuSubtitle}>Sign up for an account</Text>
+                <Text style={[styles.menuTitle, styles.menuTitle]}>Test Notifications</Text>
+                <Text style={styles.menuSubtitle}>Send a test notification</Text>
+              </View>
+            </View>
+            <Feather name="chevron-right" size={20} color="#9ca3af" />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.menuCard}
+            onPress={() => router.push('/profile/test_location')}
+          >
+            <View style={styles.menuContent}>
+              <View style={[styles.iconCircle, styles.iconGray]}>
+                <Feather name="arrow-right-circle" size={20} color="#000000ff" />
+              </View>
+              <View style={styles.menuText}>
+                <Text style={[styles.menuTitle, styles.menuTitle]}>Test Location</Text>
+                <Text style={styles.menuSubtitle}>Send a test location</Text>
               </View>
             </View>
             <Feather name="chevron-right" size={20} color="#9ca3af" />
@@ -164,6 +235,7 @@ export default function ProfileScreen() {
     </View>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {
@@ -177,6 +249,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingTop: 60,
     paddingBottom: 32,
+    borderBottomLeftRadius: 24,
+    borderBottomRightRadius: 24,
   },
   editButton: {
     position: 'absolute',
@@ -277,6 +351,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     gap: 12,
     marginBottom: 100,
+    marginTop: 24,
   },
   menuCard: {
     backgroundColor: '#fff',

@@ -82,6 +82,18 @@ export default function Layout() {
           href: null, // hides it from the tab bar
         }}
       />
+      <Tabs.Screen
+        name="profile/test_notifications"
+        options={{
+          href: null, // hides it from the tab bar
+        }}
+      />
+      <Tabs.Screen
+        name="profile/test_location"
+        options={{
+          href: null, // hides it from the tab bar
+        }}
+      />
     </Tabs>
   );
 };

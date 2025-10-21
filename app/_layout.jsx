@@ -11,7 +11,8 @@ export default function RootLayout() {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const token = await AsyncStorage.getItem("userToken");
+        // ✅ check for accessToken instead of userToken
+        const token = await AsyncStorage.getItem("accessToken");
         const inAuthGroup = segments[0] === "signin" || segments[0] === "signup";
 
         if (!token && !inAuthGroup) {
@@ -19,7 +20,7 @@ export default function RootLayout() {
           router.replace("/signin");
         } else if (token && inAuthGroup) {
           // logged in but still on signin/signup
-          router.replace("/");
+          router.replace("/(tabs)");
         }
       } catch (error) {
         console.error("Auth check failed:", error);

@@ -23,34 +23,45 @@ export default function SignupPage() {
   const [password, setPassword] = useState('');
 
   const handleSignUp = async () => {
+  try {
+    const response = await fetch("https://rewardshub.online/registration/sign-up/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        first_name: firstName,
+        last_name: lastName,
+        email: email,
+        password: password,
+      }),
+    });
+
+    const text = await response.text();
+    console.log("📜 Raw response:", text); // see what Django returns
+
+    let data;
     try {
-      const response = await fetch("https://rewardshub.online/registration/sign-up/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          first_name: firstName,
-          last_name: lastName,
-          email: email,
-          password: password,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        Alert.alert("✅ Success", "Account created successfully!");
-        console.log("User:", data);
-        router.replace("/signin"); // or /home if you want
-      } else {
-        Alert.alert("❌ Error", data.error || "Signup failed.");
-      }
-    } catch (error) {
-      console.error("Signup error:", error);
-      Alert.alert("⚠️ Network Error", "Could not connect to server.");
+      data = JSON.parse(text);
+    } catch (parseErr) {
+      console.error("❌ JSON Parse Error:", parseErr);
+      Alert.alert("Server Error", "Invalid response from server.");
+      return;
     }
-  };
+
+    if (response.ok) {
+      Alert.alert("✅ Success", "Account created successfully!");
+      console.log("User:", data);
+      router.replace("/signin");
+    } else {
+      console.warn("⚠️ Signup failed:", data);
+      Alert.alert("❌ Error", data.detail || data.error || "Signup failed.");
+    }
+  } catch (error) {
+    console.error("Signup error:", error);
+    Alert.alert("⚠️ Network Error", "Could not connect to server.");
+  }
+};
 
   return (
     <KeyboardAvoidingView
