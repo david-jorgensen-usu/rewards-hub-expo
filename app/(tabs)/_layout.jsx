@@ -6,7 +6,7 @@ export default function Layout() {
   return (
     <Tabs screenOptions={{ 
       headerShown: false, 
-      tabBarActiveTintColor: "#f9b145",
+      tabBarActiveTintColor: "#2255EB",
     }} >
       <Tabs.Screen 
         name="index" 

@@ -110,7 +110,7 @@ export default function AlertsPage() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFF7ED',
+    backgroundColor: '#F3F4F6',
   },
   scrollView: {
     flex: 1,
@@ -152,7 +152,7 @@ const styles = StyleSheet.create({
   },
   alertCardUnread: {
     borderLeftWidth: 4,
-    borderLeftColor: '#F97316',
+    borderLeftColor: '#2255EB',
   },
   iconContainer: {
     width: 48,

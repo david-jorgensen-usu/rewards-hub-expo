@@ -40,7 +40,7 @@ export default function FeedbackPage() {
       <View style={styles.header}>
         <Text style={styles.title}>Feedback</Text>
         <Text style={styles.subtitle}>
-          Tell us what you think! 🧡
+          Tell us what you think! We value your feedback to improve RewardsHub.
         </Text>
       </View>
 
@@ -70,7 +70,7 @@ export default function FeedbackPage() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFF7ED',
+    backgroundColor: '#F3F4F6', // updated background
     padding: 20,
   },
   header: {
@@ -79,19 +79,21 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 28,
-    fontWeight: 'bold',
-    color: '#111827',
+    fontFamily: 'Bahnschrift-SemiBold', // title font
+    color: '#2255EB', // primary color
   },
   subtitle: {
-    fontSize: 16,
-    color: '#6B7280',
+    fontSize: 14, // roughly half of title
+    fontFamily: 'Segoe UI', // subtitle font
+    fontWeight: '300', // light
+    color: '#4A4A4A', // secondary color
     marginTop: 4,
   },
   form: {
     marginTop: 20,
   },
   inputContainer: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#FFFFFF', // can keep white for input contrast
     borderRadius: 16,
     paddingHorizontal: 16,
     paddingVertical: 12,
@@ -107,16 +109,17 @@ const styles = StyleSheet.create({
   icon: {
     marginRight: 8,
     marginTop: 4,
+    color: '#2255EB', // primary color for icon
   },
   input: {
     flex: 1,
     fontSize: 16,
-    color: '#111827',
+    color: '#4A4A4A', // secondary for text
     minHeight: 80,
     textAlignVertical: 'top',
   },
   button: {
-    backgroundColor: '#F97316',
+    backgroundColor: '#2255EB', // primary for button
     paddingVertical: 14,
     borderRadius: 16,
     alignItems: 'center',
@@ -128,13 +131,13 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: '#FFFFFF',
-    fontWeight: '600',
+    fontFamily: 'Bahnschrift-SemiBold',
     fontSize: 16,
   },
   status: {
     marginTop: 16,
     fontSize: 14,
-    color: '#6B7280',
+    color: '#4A4A4A', // secondary
     textAlign: 'center',
   },
 });

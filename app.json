@@ -3,15 +3,15 @@
     "name": "RewardsHub",
     "slug": "rewardshub",
     "version": "1.0.0",
-    "icon": "./assets/icons/rewardshub-icon.png",
+    "icon": "./assets/icons/rewardshub-icon-square.png",
     "splash": {
-      "image": "./assets/icons/rewardshub-splash.png",
+      "image": "./assets/icons/rewardshub-splash-new.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/icons/rewardshub-icon.png",
+        "foregroundImage": "./assets/icons/rewardshub-icon-square.png",
         "backgroundColor": "#ffffff"
       },
       "package": "com.rewardshubonline.rewardshub"

@@ -95,7 +95,7 @@ export default function CafeZupasApp() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFF7ED',
+    backgroundColor: '#F3F4F6',
   },
   scrollView: {
     flex: 1,

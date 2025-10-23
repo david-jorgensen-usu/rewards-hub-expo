@@ -105,7 +105,7 @@ export default function ProfileScreen() {
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {/* Profile Header */}
         <LinearGradient
-          colors={['#fb923c', '#f59e0b']}
+          colors={['#2255EB', '#1B44C4']} // primary to slightly darker shade
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={styles.headerGradient}
@@ -240,7 +240,7 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fffbeb',
+    backgroundColor: '#F3F4F6', // light background
   },
   scrollView: {
     flex: 1,
@@ -251,6 +251,7 @@ const styles = StyleSheet.create({
     paddingBottom: 32,
     borderBottomLeftRadius: 24,
     borderBottomRightRadius: 24,
+    backgroundColor: '#2255EB', // primary color
   },
   editButton: {
     position: 'absolute',
@@ -283,7 +284,7 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     borderRadius: 44,
-    backgroundColor: '#d1d5db',
+    backgroundColor: '#4A4A4A', // secondary color
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -294,19 +295,22 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: 14,
-    backgroundColor: '#22c55e',
+    backgroundColor: '#22C55E', // keeping green for status
     borderWidth: 4,
     borderColor: '#fff',
   },
   name: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#fff',
+    fontSize: 28, // ~2x subtitle
+    fontFamily: 'Bahnschrift-SemiBold',
+    fontWeight: '600',
+    color: '#FFFFFF', // header contrast
     marginBottom: 4,
   },
   email: {
     fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.9)',
+    fontFamily: 'Segoe UI',
+    fontWeight: '300',
+    color: '#FFFFFF', // header contrast
   },
   statsContainer: {
     paddingHorizontal: 16,
@@ -314,13 +318,13 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   statsCard: {
-    backgroundColor: '#fff',
+    backgroundColor: '#FFFFFF',
     borderRadius: 16,
     padding: 24,
     flexDirection: 'row',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.05,
     shadowRadius: 8,
     elevation: 8,
   },
@@ -331,21 +335,19 @@ const styles = StyleSheet.create({
   statItemBorder: {
     borderLeftWidth: 1,
     borderRightWidth: 1,
-    borderColor: '#e5e7eb',
+    borderColor: '#E5E7EB',
   },
   statNumber: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#111827',
+    fontSize: 28, // matches title size
+    fontFamily: 'Bahnschrift-SemiBold',
+    color: '#2255EB', // primary color
     marginBottom: 4,
   },
-  statNumberOrange: {
-    color: '#f97316',
-  },
   statLabel: {
-    fontSize: 12,
-    color: '#6b7280',
-    fontWeight: '500',
+    fontSize: 14, // subtitle size
+    fontFamily: 'Segoe UI',
+    color: '#4A4A4A', // secondary color
+    fontWeight: '300',
   },
   menuContainer: {
     paddingHorizontal: 16,
@@ -354,7 +356,7 @@ const styles = StyleSheet.create({
     marginTop: 24,
   },
   menuCard: {
-    backgroundColor: '#fff',
+    backgroundColor: '#FFFFFF',
     borderRadius: 12,
     padding: 20,
     flexDirection: 'row',
@@ -378,49 +380,37 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 16,
-  },
-  iconBlue: {
-    backgroundColor: '#dbeafe',
-  },
-  iconPurple: {
-    backgroundColor: '#f3e8ff',
-  },
-  iconGreen: {
-    backgroundColor: '#dcfce7',
-  },
-  iconRed: {
-    backgroundColor: '#fee2e2',
-  },
-  iconGray: {
-    backgroundColor: '#e5e7eb',
+    backgroundColor: '#F3F4F6', // light background for circles
   },
   menuText: {
     flex: 1,
   },
   menuTitle: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#111827',
+    fontSize: 16, // ~2x subtitle
+    fontFamily: 'Bahnschrift-SemiBold',
+    color: '#2255EB', // primary color
     marginBottom: 2,
   },
   menuTitleRed: {
-    color: '#dc2626',
+    color: '#DC2626',
   },
   menuSubtitle: {
-    fontSize: 12,
-    color: '#6b7280',
+    fontSize: 14,
+    fontFamily: 'Segoe UI',
+    color: '#4A4A4A', // secondary color
+    fontWeight: '300',
   },
   bottomNav: {
     position: 'absolute',
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: '#fff',
+    backgroundColor: '#FFFFFF',
     flexDirection: 'row',
     paddingVertical: 12,
     paddingHorizontal: 16,
     borderTopWidth: 1,
-    borderTopColor: '#e5e7eb',
+    borderTopColor: '#E5E7EB',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: -2 },
     shadowOpacity: 0.1,
@@ -434,11 +424,12 @@ const styles = StyleSheet.create({
   },
   navLabel: {
     fontSize: 12,
-    fontWeight: '500',
-    color: '#9ca3af',
+    fontFamily: 'Segoe UI',
+    fontWeight: '300',
+    color: '#4A4A4A', // secondary
   },
   navLabelActive: {
-    color: '#f97316',
+    color: '#2255EB', // primary
   },
   notificationDot: {
     position: 'absolute',
@@ -447,6 +438,8 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: '#ef4444',
+    backgroundColor: '#EF4444',
   },
 });
+
+

@@ -66,7 +66,7 @@ export default function TestNotificationsPage() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFF7ED',
+    backgroundColor: '#F3F4F6', // background-light
     alignItems: 'center',
     justifyContent: 'center',
     padding: 24,
@@ -86,21 +86,24 @@ const styles = StyleSheet.create({
   },
   icon: {
     marginBottom: 12,
+    color: '#2255EB', // primary
   },
   title: {
     fontSize: 22,
-    fontWeight: 'bold',
-    color: '#111827',
+    fontFamily: 'Bahnschrift-SemiBold',
+    color: '#2255EB', // primary
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 15,
-    color: '#6B7280',
+    fontFamily: 'Segoe UI',
+    fontWeight: '300',
+    color: '#4A4A4A', // secondary
     textAlign: 'center',
     marginBottom: 20,
   },
   button: {
-    backgroundColor: '#F97316',
+    backgroundColor: '#2255EB', // primary
     paddingVertical: 12,
     paddingHorizontal: 24,
     borderRadius: 12,
@@ -108,6 +111,6 @@ const styles = StyleSheet.create({
   buttonText: {
     color: '#FFFFFF',
     fontSize: 16,
-    fontWeight: '600',
+    fontFamily: 'Bahnschrift-SemiBold',
   },
 });

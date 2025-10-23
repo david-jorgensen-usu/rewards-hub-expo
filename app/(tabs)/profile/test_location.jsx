@@ -65,7 +65,7 @@ export default function TestLocationPage() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFF7ED',
+    backgroundColor: '#F3F4F6', // updated background
     alignItems: 'center',
     justifyContent: 'center',
     padding: 24,
@@ -85,25 +85,30 @@ const styles = StyleSheet.create({
   },
   icon: {
     marginBottom: 12,
+    color: '#2255EB', // primary color
   },
   title: {
     fontSize: 22,
-    fontWeight: 'bold',
-    color: '#111827',
+    fontFamily: 'Bahnschrift-SemiBold', // title font
+    color: '#2255EB', // primary color
     marginBottom: 16,
   },
   coordLabel: {
     fontSize: 16,
-    color: '#6B7280',
+    fontFamily: 'Segoe UI', // subtitle font
+    fontWeight: '300',
+    color: '#4A4A4A', // secondary
     marginTop: 8,
   },
   coordValue: {
     fontSize: 18,
-    fontWeight: '600',
-    color: '#111827',
+    fontFamily: 'Bahnschrift-SemiBold', // emphasize value
+    color: '#4A4A4A', // secondary
   },
   errorText: {
     fontSize: 16,
-    color: '#EF4444',
+    fontFamily: 'Segoe UI',
+    fontWeight: '300',
+    color: '#dc2626', // red for errors
   },
 });
