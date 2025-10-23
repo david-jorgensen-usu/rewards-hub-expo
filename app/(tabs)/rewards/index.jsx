@@ -1,5 +1,5 @@
 import { rewards } from '@/data/rewardsData';
-import { LinearGradient } from 'expo-linear-gradient';
+
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import {
@@ -134,76 +134,18 @@ export default function RewardsProgram() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFF7ED',
+    backgroundColor: '#F3F4F6',
   },
   scrollView: {
     flex: 1,
   },
-  header: {
-    paddingHorizontal: 24,
-    paddingTop: 52,
-    paddingBottom: 32,
-  },
-  headerTop: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  headerTitle: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: '#FFFFFF',
-  },
   headerContainer: {
-    position: 'fixed',
+    position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
-    backgroundColor: '#FFF7ED',
+    backgroundColor: '#F3F4F6',
     zIndex: 10,
-  },
-  statsCard: {
-    backgroundColor: 'rgba(255, 255, 255, 0.95)',
-    borderRadius: 16,
-    padding: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 12,
-    elevation: 8,
-  },
-  statsHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  statsLabel: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#6B7280',
-  },
-  sparkle: {
-    fontSize: 20,
-  },
-  statsPoints: {
-    fontSize: 36,
-    fontWeight: 'bold',
-    color: '#111827',
-    marginBottom: 4,
-  },
-  statsFooter: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  trendingIcon: {
-    fontSize: 16,
-    marginRight: 4,
-  },
-  statsActive: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#10B981',
   },
   searchContainer: {
     paddingHorizontal: 24,
@@ -219,18 +161,19 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.05,
     shadowRadius: 8,
     elevation: 4,
   },
   searchIcon: {
     fontSize: 20,
     marginRight: 12,
+    color: '#2255EB',
   },
   searchInput: {
     flex: 1,
     fontSize: 16,
-    color: '#111827',
+    color: '#4A4A4A',
   },
   filtersContainer: {
     paddingHorizontal: 24,
@@ -247,12 +190,12 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   filterButtonActive: {
-    backgroundColor: '#F97316',
+    backgroundColor: '#2255EB',
   },
   filterText: {
     fontSize: 14,
     fontWeight: '500',
-    color: '#374151',
+    color: '#4A4A4A',
   },
   filterTextActive: {
     color: '#FFFFFF',
@@ -263,7 +206,7 @@ const styles = StyleSheet.create({
   },
   sortLabel: {
     fontSize: 14,
-    color: '#6B7280',
+    color: '#4A4A4A',
     marginRight: 8,
   },
   sortButton: {
@@ -273,14 +216,14 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   sortButtonActive: {
-    backgroundColor: '#FED7AA',
+    backgroundColor: '#2255EB',
   },
   sortText: {
     fontSize: 14,
-    color: '#6B7280',
+    color: '#4A4A4A',
   },
   sortTextActive: {
-    color: '#C2410C',
+    color: '#FFFFFF',
     fontWeight: '500',
   },
   rewardsGrid: {
@@ -289,6 +232,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
+    paddingTop: 230,
   },
   rewardCard: {
     width: '48%',
@@ -297,7 +241,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.05,
     shadowRadius: 8,
     elevation: 4,
     overflow: 'hidden',
@@ -318,9 +262,7 @@ const styles = StyleSheet.create({
   },
   giftIcon: {
     fontSize: 16,
-  },
-  rewardEmoji: {
-    fontSize: 56,
+    color: '#2255EB',
   },
   rewardContent: {
     padding: 16,
@@ -328,32 +270,18 @@ const styles = StyleSheet.create({
   rewardName: {
     fontSize: 14,
     fontWeight: 'bold',
-    color: '#111827',
+    color: '#4A4A4A',
     marginBottom: 4,
-  },
-  rewardPoints: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'baseline',
-    marginBottom: 12,
   },
   pointsValue: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#F97316',
+    color: '#2255EB',
   },
   pointsLabel: {
     fontSize: 12,
-    color: '#6B7280',
+    color: '#4A4A4A',
     fontWeight: '500',
-  },
-  redeemButton: {
-    borderRadius: 8,
-    overflow: 'hidden',
-  },
-  redeemGradient: {
-    paddingVertical: 8,
-    alignItems: 'center',
   },
   redeemText: {
     color: '#FFFFFF',
@@ -375,23 +303,16 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: -2 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.05,
     shadowRadius: 8,
     elevation: 8,
-  },
-  navItem: {
-    alignItems: 'center',
-  },
-  navIcon: {
-    fontSize: 24,
-    marginBottom: 4,
   },
   navLabel: {
     fontSize: 12,
     fontWeight: '500',
-    color: '#9CA3AF',
+    color: '#4A4A4A',
   },
   navLabelActive: {
-    color: '#F97316',
+    color: '#2255EB',
   },
 });

@@ -20,7 +20,7 @@ export default function SigninPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
- const handleSignIn = async () => {
+  const handleSignIn = async () => {
     try {
       const response = await fetch('https://rewardshub.online/api/token/', {
         method: 'POST',
@@ -46,54 +46,59 @@ export default function SigninPage() {
 
   return (
     <KeyboardAvoidingView
-      style={{ flex: 1, backgroundColor: '#fff' }}
+      style={styles.container}
       behavior="padding"
-keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 20}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 20}
     >
       <ScrollView
         contentContainerStyle={styles.scrollContainer}
         keyboardShouldPersistTaps="handled"
       >
-        <View style={styles.container}>
+        {/* Logo Square */}
+        <View style={styles.logoSquare}>
           <Image
             source={require('@/assets/rewardsHubLogos/rewardshub.png')}
-            style={styles.welcomeImage}
+            style={styles.logoImage}
             resizeMode="contain"
           />
-          <Text style={styles.welcomeText}>Welcome back, friend!</Text>
+        </View>
 
-          <View style={styles.inputContainer}>
-            <TextInput
-              style={styles.input}
-              placeholder="Email"
-              placeholderTextColor="#8c8c8c"
-              value={email}
-              onChangeText={setEmail}
-              keyboardType="email-address"
-              autoCapitalize="none"
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Password"
-              placeholderTextColor="#8c8c8c"
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry
-            />
+        {/* Title & Subtitle */}
+        <Text style={styles.title}>RewardsHub</Text>
+        <Text style={styles.subtitle}>Your rewards, connected.</Text>
 
-            <TouchableOpacity style={styles.signInButton} onPress={handleSignIn}>
-              <Text style={styles.signInText}>Sign In</Text>
-            </TouchableOpacity>
+        {/* Inputs */}
+        <View style={styles.inputContainer}>
+          <TextInput
+            style={styles.input}
+            placeholder="Email"
+            placeholderTextColor="#8c8c8c"
+            value={email}
+            onChangeText={setEmail}
+            keyboardType="email-address"
+            autoCapitalize="none"
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Password"
+            placeholderTextColor="#8c8c8c"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+          />
 
-            <TouchableOpacity
-              style={styles.createAccountButton}
-              onPress={() => navigate('signup')}
-            >
-              <Text style={styles.createAccountText}>
-                New here? Create an account
-              </Text>
-            </TouchableOpacity>
-          </View>
+          <TouchableOpacity style={styles.signInButton} onPress={handleSignIn}>
+            <Text style={styles.signInText}>Sign In</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.createAccountButton}
+            onPress={() => navigate('signup')}
+          >
+            <Text style={styles.createAccountText}>
+              New here? Create an account
+            </Text>
+          </TouchableOpacity>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -101,62 +106,77 @@ keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 20}
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#F3F4F6',
+  },
   scrollContainer: {
     flexGrow: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#fff',
+    paddingVertical: 40,
   },
-  container: {
+  logoSquare: {
+    width: 200,
+    height: 200,
+    justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
   },
-  welcomeImage: {
-    height: 300,
-    width: 300,
+  logoImage: {
+    width: 200,
+    height: 200,
   },
-  welcomeText: {
-    fontSize: 24,
-    fontWeight: 'bold',
+  title: {
+    fontFamily: 'Bahnschrift-SemiBold',
+    fontSize: 36, // approx 2x subtitle
+    color: '#2255EB',
     textAlign: 'center',
-    marginTop: 20,
-    color: '#4e2a14',
+    marginBottom: 8,
+  },
+  subtitle: {
+    fontFamily: 'Segoe UI',
+    fontWeight: '300', // light
+    fontSize: 18,
+    color: '#4A4A4A',
+    textAlign: 'center',
+    marginBottom: 30,
   },
   inputContainer: {
-    marginTop: 30,
-    width: '100%',
+    width: '80%',
     alignItems: 'center',
     gap: 15,
   },
   input: {
-    width: 250,
+    width: '100%',
     borderWidth: 1,
-    borderColor: '#f9b145',
+    borderColor: '#2255EB',
     borderRadius: 8,
-    padding: 10,
+    padding: 12,
     fontSize: 16,
-    color: '#4e2a14',
+    color: '#4A4A4A',
+    backgroundColor: '#fff',
   },
   signInButton: {
-    backgroundColor: '#f9b145',
+    backgroundColor: '#2255EB',
     borderRadius: 8,
-    paddingVertical: 10,
+    paddingVertical: 12,
     paddingHorizontal: 20,
-    width: 250,
+    width: '100%',
     alignItems: 'center',
+    marginTop: 10,
   },
   signInText: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#4e2a14',
+    color: '#F3F4F6',
   },
   createAccountButton: {
-    marginTop: 10,
+    marginTop: 12,
   },
   createAccountText: {
     fontSize: 16,
-    fontWeight: '500',
-    color: '#4e2a14',
+    fontWeight: '400',
+    color: '#4A4A4A',
     textAlign: 'center',
   },
 });
