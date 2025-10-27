@@ -10,6 +10,7 @@ import {
   Text,
   TouchableOpacity,
   View,
+  Image,
 } from 'react-native';
 
 export default function ProfileScreen() {
@@ -110,16 +111,13 @@ export default function ProfileScreen() {
           end={{ x: 1, y: 1 }}
           style={styles.headerGradient}
         >
-          <TouchableOpacity style={styles.editButton}>
-            <Feather name="edit-2" size={16} color="#fff" />
-          </TouchableOpacity>
-
           <View style={styles.profileSection}>
             <View style={styles.avatarContainer}>
               <View style={styles.avatarBorder}>
-                <View style={styles.avatar}>
-                  <Feather name="user" size={48} color="#fff" />
-                </View>
+                <Image
+                  source={require('@/assets/rewardsHubLogos/rewardshub.png')}
+                  style={styles.avatar}
+                />
               </View>
             </View>
 
@@ -284,7 +282,7 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     borderRadius: 44,
-    backgroundColor: '#4A4A4A', // secondary color
+    backgroundColor: '#F3F4F6', // secondary color
     justifyContent: 'center',
     alignItems: 'center',
   },

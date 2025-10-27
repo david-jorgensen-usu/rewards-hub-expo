@@ -11,18 +11,7 @@ export default function Layout() {
       <Tabs.Screen 
         name="index" 
         options={{ 
-          title: "Home",
-          tabBarIcon: ({ color, size}) => (
-            <Ionicons name="home-outline" size={size} color={color} />
-          )
-        }} 
-      />
-      <Tabs.Screen 
-        name="rewards/index" 
-        options={{ 
           title: "Rewards",
-          tabBarLabel: "Rewards",
-          unmountOnBlur: true,
           tabBarIcon: ({ color, size}) => (
             <Ionicons name="gift-outline" size={size} color={color} />
           )

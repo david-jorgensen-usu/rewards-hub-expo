@@ -1,181 +1,195 @@
-import { recentEntries } from '@/data/recentEntries';
-import { rewards } from '@/data/rewardsData';
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useRouter } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import { rewards } from "@/data/companyData";
+import { useRouter } from "expo-router";
+import React, { useState } from "react";
 import {
-  ImageBackground,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View
-} from 'react-native';
+    Image,
+    ScrollView,
+    StatusBar,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
+} from "react-native";
 
-export default function HomePage() {
+// Helper to convert reward name to companyImages key
+const getCompanyKey = (name) => name.toLowerCase().replace(/\s+/g, '-');
+
+export default function RewardsPage() {
   const router = useRouter();
-  const [firstName, setFirstName] = useState("");
+  const [activeFilter, setActiveFilter] = useState("all");
+  const [sortBy, setSortBy] = useState("points");
+  const [searchQuery, setSearchQuery] = useState("");
 
-  const mergedEntries = recentEntries.map(entry => {
-    const reward = rewards.find(r => r.reference === entry.brand);
-    return { ...entry, ...(reward || {}) };
-  });
-
-  const refreshToken = async () => {
-    const refresh = await AsyncStorage.getItem("refreshToken");
-    if (!refresh) return null;
-
-    try {
-      const response = await fetch("https://rewardshub.online/api/token/refresh/", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ refresh }),
-      });
-      const data = await response.json();
-      if (response.ok && data.access) {
-        await AsyncStorage.setItem("accessToken", data.access);
-        return data.access;
-      } else return null;
-    } catch {
-      return null;
-    }
-  };
-
-  const fetchUser = async () => {
-    try {
-      let token = await AsyncStorage.getItem("accessToken");
-      if (!token) return;
-
-      const response = await fetch("https://rewardshub.online/api/user/", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const data = await response.json();
-
-      if (!response.ok && data.code === "token_not_valid") {
-        token = await refreshToken();
-        if (token) return fetchUser(); 
-        return;
-      }
-
-      if (response.ok && data.first_name) setFirstName(data.first_name);
-    } catch {}
-  };
-
-  useEffect(() => {
-    fetchUser();
-  }, []);
+  const filteredRewards = rewards
+    .filter((r) => activeFilter === "all" ? true : r.category === activeFilter)
+    .filter((r) => r.name.toLowerCase().includes(searchQuery.toLowerCase()))
+    .sort((a, b) =>
+      sortBy === "points" ? 0 : a.name.localeCompare(b.name)
+    ); // points removed as field no longer exists
 
   return (
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" />
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-        {/* Header */}
-        <View style={styles.header}>
-          <Text style={styles.greeting}>Hi {firstName || "there"}! 👋</Text>
-        </View>
-
-        {/* Recent Entries */}
-        <View style={styles.recentSection}>
-          <Text style={styles.recentTitle}>Recent Activity</Text>
-          <View style={styles.entriesList}>
-            {mergedEntries.map((entry) => (
-              <TouchableOpacity
-                key={entry.id}
-                style={styles.entryCard}
-                activeOpacity={0.7}
-                onPress={() => router.push(`/rewards/${entry.reference}`)}
-              >
-                <View style={styles.entryContent}>
-                  <View style={styles.entryLeft}>
-                    <ImageBackground
-                      style={styles.logoContainer}
-                      source={entry.logoFile}
-                      imageStyle={{ borderRadius: 8 }}
-                    />
-                    <View>
-                      <Text style={styles.brandName}>{entry.name}</Text>
-                      <Text style={styles.entryDate}>{entry.date}</Text>
-                    </View>
-                  </View>
-                </View>
-              </TouchableOpacity>
-            ))}
+      <ScrollView contentContainerStyle={styles.scroll}>
+        {/* Search Bar */}
+        <View style={styles.searchContainer}>
+          <View style={styles.searchBar}>
+            <Text style={styles.searchIcon}>🔍</Text>
+            <TextInput
+              style={styles.searchInput}
+              placeholder="Search rewards..."
+              placeholderTextColor="#9CA3AF"
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+            />
           </View>
         </View>
-        <View style={{ height: 100 }} />
+
+        {/* Filters */}
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterScroll}>
+          {[
+            { id: "all", label: "All", icon: "🎁" },
+            { id: "food", label: "Food", icon: "🍔" },
+            { id: "grocery", label: "Grocery", icon: "🛒" },
+            { id: "gas", label: "Gas", icon: "⛽" },
+            { id: "entertainment", label: "Entertainment", icon: "🎬" },
+            { id: "shopping", label: "Shopping", icon: "🛍️" },
+          ].map((filter) => (
+            <TouchableOpacity
+              key={filter.id}
+              onPress={() => setActiveFilter(filter.id)}
+              style={[
+                styles.filterButton,
+                activeFilter === filter.id && styles.filterButtonActive,
+              ]}
+            >
+              <Text
+                style={[
+                  styles.filterText,
+                  activeFilter === filter.id && styles.filterTextActive,
+                ]}
+              >
+                {filter.icon} {filter.label}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+
+        {/* Sort Buttons */}
+        <View style={styles.sortContainer}>
+          <Text style={styles.sortLabel}>Sort by:</Text>
+          <TouchableOpacity
+            onPress={() => setSortBy("name")}
+            style={[styles.sortButton, sortBy === "name" && styles.sortButtonActive]}
+          >
+            <Text style={[styles.sortText, sortBy === "name" && styles.sortTextActive]}>
+              Name
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Rewards Grid */}
+        <View style={styles.grid}>
+          {filteredRewards.map((item, index) => {
+            const companyKey = getCompanyKey(item.name);
+            const imageSource = item.logoFile;
+
+            if (!imageSource) return null;
+
+            return (
+              <TouchableOpacity
+                key={`${companyKey}-${index}`}
+                activeOpacity={0.8}
+                style={styles.tile}
+                onPress={() =>
+                  router.push({
+                    pathname: `/rewards/${item.reference}`,
+                    params: {
+                      reference: item.reference,
+                      name: item.name,
+                      color: item.color,
+                      category: item.category,
+                      logoFile: item.logoFile,
+                      active: true,
+                    },
+                  })
+                }
+              >
+                <Image source={imageSource} style={styles.icon} resizeMode="cover" />
+              </TouchableOpacity>
+            );
+          })}
+        </View>
       </ScrollView>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F3F4F6',
-  },
-  scrollView: {
-    flex: 1,
-    paddingHorizontal: 24,
-    paddingTop: 32,
-  },
-  header: {
-    marginBottom: 24,
-  },
-  greeting: {
-    fontFamily: 'Bahnschrift-SemiBold',
-    fontSize: 36,
-    color: '#2255EB',
-  },
-  recentSection: {
-    marginBottom: 40,
-  },
-  recentTitle: {
-    fontFamily: 'Bahnschrift-SemiBold',
-    fontSize: 24,
-    color: '#2255EB',
-    marginBottom: 16,
-  },
-  entriesList: {
-    gap: 15,
-  },
-  entryCard: {
-    backgroundColor: '#fff',
-    borderRadius: 16,
-    padding: 16,
-    shadowColor: '#000',
+  container: { flex: 1, backgroundColor: "#F3F4F6" },
+  scroll: { paddingTop: 60, paddingHorizontal: 24 },
+  searchContainer: { marginBottom: 16 },
+  searchBar: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#FFFFFF",
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
     shadowRadius: 8,
-    elevation: 2,
+    elevation: 4,
   },
-  entryContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  searchIcon: { fontSize: 20, marginRight: 12, color: "#2255EB" },
+  searchInput: { flex: 1, fontSize: 16, color: "#4A4A4A" },
+  filterScroll: { marginBottom: 16 },
+  filterButton: {
+    backgroundColor: "#FFFFFF",
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 12,
+    marginRight: 8,
   },
-  entryLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 16,
-  },
-  logoContainer: {
-    width: 56,
-    height: 32,
+  filterButtonActive: { backgroundColor: "#2255EB" },
+  filterText: { fontSize: 14, fontWeight: "500", color: "#4A4A4A" },
+  filterTextActive: { color: "#FFFFFF" },
+  sortContainer: { flexDirection: "row", alignItems: "center", marginBottom: 20 },
+  sortLabel: { fontSize: 14, color: "#4A4A4A", marginRight: 8 },
+  sortButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
     borderRadius: 8,
-    backgroundColor: '#2255EB',
-    justifyContent: 'center',
-    alignItems: 'center',
+    marginRight: 8,
+    backgroundColor: "#E5E7EB",
   },
-  brandName: {
-    fontFamily: 'Bahnschrift-SemiBold',
-    fontSize: 18,
-    color: '#4A4A4A',
+  sortButtonActive: { backgroundColor: "#2255EB" },
+  sortText: { fontSize: 14, color: "#4A4A4A" },
+  sortTextActive: { color: "#FFFFFF", fontWeight: "500" },
+  grid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "flex-start",
+    gap: 10, // spacing between tiles
+    width: "100%",
+    paddingBottom: 100,
+    },
+  tile: {
+    width: "22%",
+    aspectRatio: 16 / 9,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 10,
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 20,
+    overflow: "hidden",
+    shadowColor: "#000",
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 3,
   },
-  entryDate: {
-    fontFamily: 'Segoe UI',
-    fontWeight: '300',
-    fontSize: 14,
-    color: '#4A4A4A',
-    marginTop: 2,
-  },
+  icon: { width: "100%", height: "100%", borderRadius: 10 },
 });
