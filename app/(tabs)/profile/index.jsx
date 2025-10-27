@@ -4,13 +4,13 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
+  Image,
   ScrollView,
   StatusBar,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
-  Image,
 } from 'react-native';
 
 export default function ProfileScreen() {
@@ -18,35 +18,38 @@ export default function ProfileScreen() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // 🔁 Refresh token logic (your working version)
-  const refreshToken = async () => {
-    try {
-      const refresh = await AsyncStorage.getItem("refresh");
-      if (!refresh) {
-        console.warn("⚠️ No refresh token found");
-        return null;
-      }
-
-      const response = await fetch("https://rewardshub.online/api/token/refresh/", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ refresh }),
-      });
-
-      const data = await response.json();
-      if (response.ok && data.access) {
-        await AsyncStorage.setItem("accessToken", data.access);
-        console.log("✅ Access token refreshed");
-        return data.access;
-      } else {
-        console.warn("⚠️ Failed to refresh token:", data);
-        return null;
-      }
-    } catch (err) {
-      console.error("Error refreshing token:", err);
+const refreshToken = async () => {
+  try {
+    const refresh = await AsyncStorage.getItem("refresh");
+    if (!refresh) {
+      console.warn("⚠️ No refresh token found, redirecting to sign in");
+      router.replace("/signin");
       return null;
     }
-  };
+
+    const response = await fetch("https://rewardshub.online/api/token/refresh/", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ refresh }),
+    });
+
+    const data = await response.json();
+    if (response.ok && data.access) {
+      await AsyncStorage.setItem("accessToken", data.access);
+      console.log("✅ Access token refreshed");
+      return data.access;
+    } else {
+      console.warn("⚠️ Failed to refresh token:", data);
+      router.replace("/signin"); // redirect if refresh fails
+      return null;
+    }
+  } catch (err) {
+    console.error("Error refreshing token:", err);
+    router.replace("/signin"); // redirect on error
+    return null;
+  }
+};
+
 
   // 👤 Fetch user profile
   const fetchUser = async () => {
