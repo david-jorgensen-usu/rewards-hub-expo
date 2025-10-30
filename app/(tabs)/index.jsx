@@ -1,32 +1,28 @@
-import { rewards } from "@/data/companyData";
+import rewards from "@/data/companyData"; // ✅ fixed import
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
-    Image,
-    ScrollView,
-    StatusBar,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Image,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
-// Helper to convert reward name to companyImages key
-const getCompanyKey = (name) => name.toLowerCase().replace(/\s+/g, '-');
+const getCompanyKey = (name) => name.toLowerCase().replace(/\s+/g, "-");
 
 export default function RewardsPage() {
   const router = useRouter();
   const [activeFilter, setActiveFilter] = useState("all");
-  const [sortBy, setSortBy] = useState("points");
   const [searchQuery, setSearchQuery] = useState("");
 
   const filteredRewards = rewards
-    .filter((r) => activeFilter === "all" ? true : r.category === activeFilter)
+    .filter((r) => (activeFilter === "all" ? true : r.category === activeFilter))
     .filter((r) => r.name.toLowerCase().includes(searchQuery.toLowerCase()))
-    .sort((a, b) =>
-      sortBy === "points" ? 0 : a.name.localeCompare(b.name)
-    ); // points removed as field no longer exists
+    .sort((a, b) => a.name.localeCompare(b.name));
 
   return (
     <View style={styles.container}>
@@ -76,19 +72,6 @@ export default function RewardsPage() {
           ))}
         </ScrollView>
 
-        {/* Sort Buttons */}
-        <View style={styles.sortContainer}>
-          <Text style={styles.sortLabel}>Sort by:</Text>
-          <TouchableOpacity
-            onPress={() => setSortBy("name")}
-            style={[styles.sortButton, sortBy === "name" && styles.sortButtonActive]}
-          >
-            <Text style={[styles.sortText, sortBy === "name" && styles.sortTextActive]}>
-              Name
-            </Text>
-          </TouchableOpacity>
-        </View>
-
         {/* Rewards Grid */}
         <View style={styles.grid}>
           {filteredRewards.map((item, index) => {
@@ -111,7 +94,6 @@ export default function RewardsPage() {
                       color: item.color,
                       category: item.category,
                       logoFile: item.logoFile,
-                      active: true,
                     },
                   })
                 }
@@ -156,26 +138,14 @@ const styles = StyleSheet.create({
   filterButtonActive: { backgroundColor: "#2255EB" },
   filterText: { fontSize: 14, fontWeight: "500", color: "#4A4A4A" },
   filterTextActive: { color: "#FFFFFF" },
-  sortContainer: { flexDirection: "row", alignItems: "center", marginBottom: 20 },
-  sortLabel: { fontSize: 14, color: "#4A4A4A", marginRight: 8 },
-  sortButton: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 8,
-    marginRight: 8,
-    backgroundColor: "#E5E7EB",
-  },
-  sortButtonActive: { backgroundColor: "#2255EB" },
-  sortText: { fontSize: 14, color: "#4A4A4A" },
-  sortTextActive: { color: "#FFFFFF", fontWeight: "500" },
   grid: {
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "flex-start",
-    gap: 10, // spacing between tiles
+    gap: 10,
     width: "100%",
     paddingBottom: 100,
-    },
+  },
   tile: {
     width: "22%",
     aspectRatio: 16 / 9,
