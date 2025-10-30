@@ -11,18 +11,7 @@ export default function Layout() {
       <Tabs.Screen 
         name="index" 
         options={{ 
-          title: "Home",
-          tabBarIcon: ({ color, size}) => (
-            <Ionicons name="home-outline" size={size} color={color} />
-          )
-        }} 
-      />
-      <Tabs.Screen 
-        name="rewards/index" 
-        options={{ 
           title: "Rewards",
-          tabBarLabel: "Rewards",
-          unmountOnBlur: true,
           tabBarIcon: ({ color, size}) => (
             <Ionicons name="gift-outline" size={size} color={color} />
           )
@@ -72,6 +61,18 @@ export default function Layout() {
       />
       <Tabs.Screen
         name="profile/delete"
+        options={{
+          href: null, // hides it from the tab bar
+        }}
+      />
+      <Tabs.Screen
+        name="profile/test_location"
+        options={{
+          href: null, // hides it from the tab bar
+        }}
+      />
+      <Tabs.Screen
+        name="profile/test_notifications"
         options={{
           href: null, // hides it from the tab bar
         }}
