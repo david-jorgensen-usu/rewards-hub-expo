@@ -54,12 +54,6 @@ export default function Layout() {
         }}
       />
       <Tabs.Screen
-        name="profile/edit"
-        options={{
-          href: null, // hides it from the tab bar
-        }}
-      />
-      <Tabs.Screen
         name="profile/delete"
         options={{
           href: null, // hides it from the tab bar
