@@ -3,12 +3,12 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import React from 'react';
-import { Alert, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View, Linking, Platform } from 'react-native';
 
 export default function CompanyApp() {
   const params = useLocalSearchParams();
   const router = useRouter();
-  const { reference, logoFile } = params;
+  const { reference, logoFile, squareLogo, website, downloadIOS, downloadAndroid, appScheme } = params;
 
   const removeApp = async () => {
     try {
@@ -24,6 +24,26 @@ export default function CompanyApp() {
     } catch (err) {
       console.error('Error removing app:', err);
       Alert.alert('Error', 'Could not remove the app. Please try again.');
+    }
+  };
+
+  const openApp = async () => {
+    try {
+      const appUrl = appScheme || '';
+      if (Platform.OS === 'ios') {
+        if (appUrl) await Linking.openURL(appUrl);
+        else throw new Error('No iOS scheme');
+      } else {
+        if (appUrl) await Linking.openURL(appUrl);
+        else throw new Error('No Android scheme');
+      }
+    } catch (err) {
+      const storeLink = Platform.OS === 'ios' ? downloadIOS : downloadAndroid;
+      if (storeLink && storeLink !== '0') {
+        Linking.openURL(storeLink);
+      } else {
+        Alert.alert('App not available', 'This app is not available for your platform.');
+      }
     }
   };
 
@@ -55,24 +75,27 @@ export default function CompanyApp() {
         </View>
 
         {/* Quick Actions */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Quick Actions</Text>
-          <View style={styles.quickActionsGrid}>
-            <TouchableOpacity style={styles.actionCard}>
-              <View style={[styles.actionIcon, { backgroundColor: '#2563eb' }]}>
-                <MaterialCommunityIcons name="web" size={24} color="white" />
-              </View>
-              <Text style={styles.actionTitle}>Visit Website</Text>
-            </TouchableOpacity>
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Quick Actions</Text>
+            <View style={styles.quickActionsGrid}>
+              {/* Visit Website */}
+              <TouchableOpacity style={styles.actionCard} onPress={() => Linking.openURL(website)}>
+                <View style={[styles.fullWidthIcon, { backgroundColor: params.color || '#2563eb' }]}>
+                  <MaterialCommunityIcons name="web" size={64} color="white" />
+                </View>
+                <Text style={styles.actionTitle}>Visit Website</Text>
+              </TouchableOpacity>
 
-            <TouchableOpacity style={styles.actionCard}>
-              <View style={[styles.actionIcon, { backgroundColor: '#f59e0b' }]}>
-                <Ionicons name="open-outline" size={24} color="white" />
-              </View>
-              <Text style={styles.actionTitle}>Open App</Text>
-            </TouchableOpacity>
+              {/* Open App */}
+              {squareLogo && (
+                <TouchableOpacity style={styles.actionCard} onPress={openApp}>
+                  <Image source={squareLogo} style={styles.fullWidthImage} resizeMode="contain" />
+                  <Text style={styles.actionTitle}>Open App</Text>
+                </TouchableOpacity>
+              )}
+            </View>
           </View>
-        </View>
+
 
         {/* Remove App Button */}
         <View style={styles.removeSection}>
@@ -137,9 +160,23 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.08,
     shadowRadius: 8,
     elevation: 3,
+    alignItems: 'center',
   },
-  actionIcon: { width: 48, height: 48, borderRadius: 24, justifyContent: 'center', alignItems: 'center', marginBottom: 12 },
-  actionTitle: { fontSize: 14, fontWeight: '600', color: '#1f2937', marginBottom: 4 },
+  fullWidthIcon: {
+    width: '100%',
+    height: 100,
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  fullWidthImage: {
+    width: '100%',
+    height: 100,
+    borderRadius: 12,
+    marginBottom: 8,
+  },
+  actionTitle: { fontSize: 14, fontWeight: '600', color: '#1f2937', textAlign: 'center' },
   removeSection: { paddingHorizontal: 24, marginBottom: 24, marginTop: 100 },
   removeButton: {
     backgroundColor: '#dc2626',
