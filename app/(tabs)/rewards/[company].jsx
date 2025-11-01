@@ -2,13 +2,33 @@ import { Ionicons } from '@expo/vector-icons';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useLocalSearchParams, useRouter } from 'expo-router';
+import * as WebBrowser from 'expo-web-browser';
 import React from 'react';
-import { Alert, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View, Linking, Platform } from 'react-native';
+import {
+  Alert,
+  Image,
+  Linking,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 
 export default function CompanyApp() {
   const params = useLocalSearchParams();
   const router = useRouter();
-  const { reference, logoFile, squareLogo, website, downloadIOS, downloadAndroid, appScheme } = params;
+  const {
+    reference,
+    logoFile,
+    squareLogo,
+    website,
+    downloadIOS,
+    downloadAndroid,
+    appScheme,
+    color,
+  } = params;
 
   const removeApp = async () => {
     try {
@@ -27,23 +47,43 @@ export default function CompanyApp() {
     }
   };
 
-  const openApp = async () => {
-    try {
-      const appUrl = appScheme || '';
-      if (Platform.OS === 'ios') {
-        if (appUrl) await Linking.openURL(appUrl);
-        else throw new Error('No iOS scheme');
-      } else {
-        if (appUrl) await Linking.openURL(appUrl);
-        else throw new Error('No Android scheme');
-      }
-    } catch (err) {
-      const storeLink = Platform.OS === 'ios' ? downloadIOS : downloadAndroid;
+  const openApp = async (website, downloadIOS, downloadAndroid) => {
+  if (!website) return;
+
+  const storeLink = Platform.OS === 'ios' ? downloadIOS : downloadAndroid;
+
+  try {
+    const supported = await Linking.canOpenURL(website);
+    if (supported) {
+      // App installed, open it
+      await Linking.openURL(website);
+    } else {
+      // App not installed, open store
       if (storeLink && storeLink !== '0') {
-        Linking.openURL(storeLink);
-      } else {
-        Alert.alert('App not available', 'This app is not available for your platform.');
+        await Linking.openURL(storeLink);
       }
+    }
+  } catch (err) {
+    console.error('Failed to open app or store:', err);
+    Alert.alert('Error', 'Failed to open the website. Please try again.');
+    // fallback to store
+    if (storeLink && storeLink !== '0') {
+      await Linking.openURL(storeLink);
+    }
+  }
+};
+
+  const openWebsite = async (url) => {
+    if (!url) {
+      Alert.alert('Link not available', 'No website URL is provided for this app.');
+      return;
+    }
+
+    try {
+      await WebBrowser.openBrowserAsync(url); // opens in Expo's in-app browser
+    } catch (err) {
+      console.error('Failed to open website:', err);
+      Alert.alert('Error', 'Failed to open the website. Please try again.');
     }
   };
 
@@ -52,9 +92,7 @@ export default function CompanyApp() {
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {/* Header */}
         <View style={styles.header}>
-          {logoFile && (
-            <Image source={logoFile} style={styles.headerBackground} resizeMode="cover" />
-          )}
+          {logoFile && <Image source={logoFile} style={styles.headerBackground} resizeMode="cover" />}
         </View>
 
         {/* Status Badge */}
@@ -66,36 +104,33 @@ export default function CompanyApp() {
               </View>
               <View>
                 <Text style={styles.statusTitle}>Location Alerts Active</Text>
-                <Text style={styles.statusSubtitle}>
-                  Get an alert when you're near a store.
-                </Text>
+                <Text style={styles.statusSubtitle}>Get an alert when you're near a store.</Text>
               </View>
             </View>
           </View>
         </View>
 
         {/* Quick Actions */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Quick Actions</Text>
-            <View style={styles.quickActionsGrid}>
-              {/* Visit Website */}
-              <TouchableOpacity style={styles.actionCard} onPress={() => Linking.openURL(website)}>
-                <View style={[styles.fullWidthIcon, { backgroundColor: params.color || '#2563eb' }]}>
-                  <MaterialCommunityIcons name="web" size={64} color="white" />
-                </View>
-                <Text style={styles.actionTitle}>Visit Website</Text>
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Quick Actions</Text>
+          <View style={styles.quickActionsGrid}>
+            {/* Visit Website */}
+            <TouchableOpacity style={styles.actionCard} onPress={() => openWebsite(website)}>
+              <View style={[styles.fullWidthIcon, { backgroundColor: color || '#2563eb' }]}>
+                <MaterialCommunityIcons name="web" size={64} color="white" />
+              </View>
+              <Text style={styles.actionTitle}>Visit Website</Text>
+            </TouchableOpacity>
+
+            {/* Open App */}
+            {squareLogo && (
+              <TouchableOpacity style={styles.actionCard} onPress={() => openApp(appScheme, downloadIOS, downloadAndroid)}>
+                <Image source={squareLogo} style={styles.fullWidthImage} resizeMode="contain" />
+                <Text style={styles.actionTitle}>Open App</Text>
               </TouchableOpacity>
-
-              {/* Open App */}
-              {squareLogo && (
-                <TouchableOpacity style={styles.actionCard} onPress={openApp}>
-                  <Image source={squareLogo} style={styles.fullWidthImage} resizeMode="contain" />
-                  <Text style={styles.actionTitle}>Open App</Text>
-                </TouchableOpacity>
-              )}
-            </View>
+            )}
           </View>
-
+        </View>
 
         {/* Remove App Button */}
         <View style={styles.removeSection}>
