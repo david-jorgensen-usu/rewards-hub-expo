@@ -1,12 +1,31 @@
 import { Ionicons } from '@expo/vector-icons';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
-import { useLocalSearchParams } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import React from 'react';
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View, Image } from 'react-native';
+import { Alert, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 export default function CompanyApp() {
   const params = useLocalSearchParams();
-  const { logoFile } = params;
+  const router = useRouter();
+  const { reference, logoFile } = params;
+
+  const removeApp = async () => {
+    try {
+      const stored = await AsyncStorage.getItem('linkedApps');
+      const linkedApps = stored ? JSON.parse(stored) : [];
+
+      const updated = linkedApps.filter((app) => app.reference !== reference);
+      await AsyncStorage.setItem('linkedApps', JSON.stringify(updated));
+
+      Alert.alert('Removed', 'This app has been removed from your active apps.', [
+        { text: 'OK', onPress: () => router.back() },
+      ]);
+    } catch (err) {
+      console.error('Error removing app:', err);
+      Alert.alert('Error', 'Could not remove the app. Please try again.');
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -14,11 +33,7 @@ export default function CompanyApp() {
         {/* Header */}
         <View style={styles.header}>
           {logoFile && (
-            <Image
-              source={logoFile}
-              style={styles.headerBackground}
-              resizeMode="cover"
-            />
+            <Image source={logoFile} style={styles.headerBackground} resizeMode="cover" />
           )}
         </View>
 
@@ -58,38 +73,32 @@ export default function CompanyApp() {
             </TouchableOpacity>
           </View>
         </View>
+
+        {/* Remove App Button */}
+        <View style={styles.removeSection}>
+          <TouchableOpacity style={styles.removeButton} onPress={removeApp}>
+            <Text style={styles.removeButtonText}>Remove App</Text>
+          </TouchableOpacity>
+        </View>
       </ScrollView>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F3F4F6',
-  },
-  scrollView: {
-    flex: 1,
-  },
+  container: { flex: 1, backgroundColor: '#F3F4F6' },
+  scrollView: { flex: 1 },
   header: {
     height: 200,
     borderBottomLeftRadius: 24,
     borderBottomRightRadius: 24,
-    overflow: 'hidden', // ensures corners are rounded
-    backgroundColor: '#2563eb', // fallback
+    overflow: 'hidden',
+    backgroundColor: '#2563eb',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  headerBackground: {
-    ...StyleSheet.absoluteFillObject,
-    width: '100%',
-    height: '100%',
-  },
-  statusContainer: {
-    paddingHorizontal: 24,
-    marginTop: 16,
-    marginBottom: 24,
-  },
+  headerBackground: { ...StyleSheet.absoluteFillObject, width: '100%', height: '100%' },
+  statusContainer: { paddingHorizontal: 24, marginTop: 16, marginBottom: 24 },
   statusBadge: {
     borderRadius: 12,
     padding: 16,
@@ -102,11 +111,7 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 4,
   },
-  statusLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
+  statusLeft: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   statusIcon: {
     width: 40,
     height: 40,
@@ -115,30 +120,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  statusTitle: {
-    color: 'white',
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  statusSubtitle: {
-    color: 'rgba(255, 255, 255, 0.8)',
-    fontSize: 12,
-    marginTop: 2,
-  },
-  section: {
-    paddingHorizontal: 24,
-    marginBottom: 24,
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#1f2937',
-    marginBottom: 16,
-  },
-  quickActionsGrid: {
-    flexDirection: 'row',
-    gap: 16,
-  },
+  statusTitle: { color: 'white', fontSize: 14, fontWeight: '600' },
+  statusSubtitle: { color: 'rgba(255, 255, 255, 0.8)', fontSize: 12, marginTop: 2 },
+  section: { paddingHorizontal: 24, marginBottom: 24 },
+  sectionTitle: { fontSize: 20, fontWeight: 'bold', color: '#1f2937', marginBottom: 16 },
+  quickActionsGrid: { flexDirection: 'row', gap: 16 },
   actionCard: {
     flex: 1,
     backgroundColor: 'white',
@@ -152,24 +138,15 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 3,
   },
-  actionIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+  actionIcon: { width: 48, height: 48, borderRadius: 24, justifyContent: 'center', alignItems: 'center', marginBottom: 12 },
+  actionTitle: { fontSize: 14, fontWeight: '600', color: '#1f2937', marginBottom: 4 },
+  removeSection: { paddingHorizontal: 24, marginBottom: 24, marginTop: 100 },
+  removeButton: {
+    backgroundColor: '#dc2626',
+    borderRadius: 12,
+    paddingVertical: 14,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 12,
   },
-  actionTitle: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#1f2937',
-    marginBottom: 4,
-  },
-  sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
+  removeButtonText: { color: '#fff', fontSize: 16, fontWeight: '600' },
 });
