@@ -20,27 +20,79 @@ export default function SigninPage() {
 
   const handleSignIn = async () => {
     try {
-      const response = await fetch('https://rewardshub.online/api/token/', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("https://rewardshub.online/api/token/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username: email, password }),
       });
 
       const data = await response.json();
-      console.log('Sign-in response:', data);
+      console.log("Sign-in response:", data);
 
       if (response.ok && data.access && data.refresh) {
-        await AsyncStorage.setItem('accessToken', data.access);
-        await AsyncStorage.setItem('refreshToken', data.refresh);
-        router.replace('/(tabs)'); // navigate to main tabs
+        // Save tokens
+        await AsyncStorage.setItem("accessToken", data.access);
+        await AsyncStorage.setItem("refreshToken", data.refresh);
+
+        // Fetch user info from server
+        const userResponse = await fetch("https://rewardshub.online/api/user/", {
+          method: "GET",
+          headers: {
+            "Authorization": `Bearer ${data.access}`,
+            "Content-Type": "application/json",
+          },
+        });
+
+        const userData = await userResponse.json();
+        console.log("User data:", userData);
+
+        if (userResponse.ok) {
+          // Clear local linked apps first to avoid mismatches
+          await AsyncStorage.removeItem("linkedApps");
+
+          // Build linkedApps from server data
+          const linkedApps = Array.isArray(userData.linked_apps)
+            ? userData.linked_apps.map(app => ({
+                reference: app.reference,
+                isActive: true,       // assume all linked apps are active initially
+                notify: true,         // default notify value
+              }))
+            : [];
+
+          // Save linked apps to AsyncStorage
+          await AsyncStorage.setItem("linkedApps", JSON.stringify(linkedApps));
+
+          // Save user data
+          await AsyncStorage.setItem("userData", JSON.stringify(userData));
+
+          // Redirect after sign in
+          setTimeout(() => {
+            router.replace("/(tabs)", { reload: true });
+          }, 500);
+
+          return;
+        }
+
+        // Handle invalid token
+        if (userData.code === "token_not_valid") {
+          console.warn("Token expired or invalid, logging out...");
+          await AsyncStorage.multiRemove(["accessToken", "refreshToken", "userData", "linkedApps"]);
+          alert("Session expired. Please sign in again.");
+          router.replace("/(auth)/signin");
+          return;
+        }
+
+        console.warn("Failed to fetch user data:", userData);
+        alert("Unable to load user info. Please try again.");
       } else {
-        alert(data.detail || 'Invalid credentials');
+        alert(data.detail || "Invalid credentials");
       }
     } catch (err) {
-      console.error('Sign-in error:', err);
-      alert('Network error');
+      console.error("Sign-in error:", err);
+      alert("Network error. Please check your connection.");
     }
   };
+
 
   return (
     <KeyboardAvoidingView
@@ -99,6 +151,7 @@ export default function SigninPage() {
     </KeyboardAvoidingView>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F3F4F6' },

@@ -1,7 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import { useEffect } from "react";
-import { ActivityIndicator, Text, View } from "react-native";
+import { ActivityIndicator, Text, View, InteractionManager } from "react-native";
 
 export default function LogoutScreen() {
   const router = useRouter();
@@ -9,12 +9,13 @@ export default function LogoutScreen() {
   useEffect(() => {
     const logout = async () => {
       try {
-        // 🧹 Clear auth tokens
-        await AsyncStorage.removeItem("accessToken");
-        await AsyncStorage.removeItem("refreshToken");
+        // Clear all user-related storage
+        await AsyncStorage.multiRemove(["accessToken", "refreshToken", "userData", "linkedApps"]);
 
-        // ⏩ Redirect back to sign-in page
-        router.replace("/signin");
+        // Defer navigation until all interactions / renders are done
+        InteractionManager.runAfterInteractions(() => {
+          router.replace("/signin");
+        });
       } catch (error) {
         console.error("Logout failed:", error);
       }

@@ -1,17 +1,19 @@
 import rewards from "@/data/companyData";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
+import { useFocusEffect } from '@react-navigation/native';
+import { useCallback } from 'react';
 import React, { useEffect, useState } from "react";
 import {
-  Image,
   FlatList,
+  Image,
+  ScrollView,
   StatusBar,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
-  ScrollView,
 } from "react-native";
 
 const CATEGORY_FILTERS = [
@@ -30,29 +32,39 @@ export default function RewardsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortStatus, setSortStatus] = useState("all"); // all / active / inactive
 
-  // Load linked apps from AsyncStorage and merge with companyData
   const loadApps = async () => {
     try {
       const stored = await AsyncStorage.getItem("linkedApps");
       const linkedApps = stored ? JSON.parse(stored) : [];
 
-      // Merge companyData with linked apps
       const mergedApps = rewards.map((app) => ({
         ...app,
         active: linkedApps.some((linked) => linked.reference === app.reference),
       }));
 
       setApps(mergedApps);
+
+      const anyActive = mergedApps.some((app) => app.active);
+      setSortStatus(anyActive ? "active" : "all");
     } catch (err) {
       console.error("Error loading apps:", err);
     }
   };
 
+  // Call on component mount
   useEffect(() => {
     loadApps();
   }, []);
 
-  // Filter + search + sort
+  // Call whenever the page gains focus
+  useFocusEffect(
+    useCallback(() => {
+      loadApps();
+    }, [])
+  );
+
+
+  // Apply filters, search, and sort
   const filteredApps = apps
     .filter((app) => (activeCategory === "all" ? true : app.category === activeCategory))
     .filter((app) => {
@@ -126,7 +138,7 @@ export default function RewardsPage() {
           return (
             <TouchableOpacity
               activeOpacity={0.8}
-              style={[styles.tile, !item.active && { opacity: 0.5 }]} // <-- apply 50% opacity if inactive
+              style={[styles.tile, !item.active && { opacity: 0.5 }]}
               onPress={() =>
                 router.push({
                   pathname: `/rewards/${item.reference}`,
@@ -142,6 +154,7 @@ export default function RewardsPage() {
     </View>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#F3F4F6" },

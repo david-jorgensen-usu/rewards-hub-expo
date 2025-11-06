@@ -1,4 +1,6 @@
+import { getAccessToken } from '@/utils/auth';
 import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
@@ -11,31 +13,48 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { getAccessToken } from '@/utils/auth';
 
 export default function ProfileScreen() {
   const router = useRouter();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // Fetch user from AsyncStorage and API
   const fetchUser = async () => {
-    const token = await getAccessToken(router);
-    if (!token) {
-      setLoading(false);
-      return;
-    }
-
     try {
-      const response = await fetch('https://rewardshub.online/api/user/', {
+      const storedUser = await AsyncStorage.getItem('userData');
+      const cached = storedUser ? JSON.parse(storedUser) : null;
+      if (cached) setUser(cached); // show immediately
+
+      const token = await getAccessToken(router);
+      if (!token) return setLoading(false);
+
+      const res = await fetch('https://rewardshub.online/api/user/', {
         headers: { Authorization: `Bearer ${token}` },
       });
-      const data = await response.json();
-      if (response.ok) setUser(data);
-      else console.warn('Server error:', data);
+      if (!res.ok) return setLoading(false);
+
+      const data = await res.json();
+      setUser(data); // overwrite cached user
+      await AsyncStorage.setItem('userData', JSON.stringify(data));
     } catch (err) {
-      console.error('Error fetching user:', err);
+      console.error(err);
     } finally {
       setLoading(false);
+    }
+  };
+
+
+  // Update linked apps in AsyncStorage
+  const updateLinkedApps = async (linkedApps) => {
+    try {
+      const storedUser = await AsyncStorage.getItem('userData');
+      const current = storedUser ? JSON.parse(storedUser) : {};
+      const updated = { ...current, linked_apps: linkedApps };
+      await AsyncStorage.setItem('userData', JSON.stringify(updated));
+      setUser(updated);
+    } catch (err) {
+      console.error('Failed to update linked apps:', err);
     }
   };
 
@@ -64,15 +83,20 @@ export default function ProfileScreen() {
               </View>
             </View>
             <Text style={styles.name}>
-              {loading ? 'Loading...' : [user?.first_name, user?.last_name].filter(Boolean).join(' ') || 'Unknown'}
+              {loading
+                ? 'Loading...'
+                : user?.first_name || user?.last_name
+                ? `${user.first_name} ${user.last_name}`
+                : 'Unknown'}
             </Text>
-            <Text style={styles.email}>{!loading && user?.email}</Text>
+            <Text style={styles.email}>
+              {!loading && (user?.email || 'Unknown')}
+            </Text>
           </View>
         </LinearGradient>
 
         {/* Menu Options */}
         <View style={styles.menuContainer}>
-          {/* Provide Feedback */}
           <MenuCard
             icon={<MaterialCommunityIcons name="message-outline" size={20} color="#2563eb" />}
             iconBg="#F3F4F6"
@@ -80,8 +104,6 @@ export default function ProfileScreen() {
             subtitle="Help us improve the app"
             onPress={() => router.push('/profile/feedback')}
           />
-
-          {/* Privacy Policy */}
           <MenuCard
             icon={<Feather name="shield" size={20} color="#9333ea" />}
             iconBg="#F3F4F6"
@@ -89,8 +111,6 @@ export default function ProfileScreen() {
             subtitle="Learn about our privacy practices"
             onPress={() => router.push('/profile/privacy')}
           />
-
-          {/* Log Out */}
           <MenuCard
             icon={<Feather name="log-out" size={20} color="#dc2626" />}
             iconBg="#F3F4F6"
@@ -99,8 +119,6 @@ export default function ProfileScreen() {
             titleColor="#DC2626"
             onPress={() => router.push('/profile/logout')}
           />
-
-          {/* Delete Account */}
           <MenuCard
             icon={<Feather name="trash-2" size={20} color="#dc2626" />}
             iconBg="#F3F4F6"
@@ -109,8 +127,6 @@ export default function ProfileScreen() {
             titleColor="#DC2626"
             onPress={() => router.push('/profile/delete')}
           />
-
-          {/* Test Notifications */}
           <MenuCard
             icon={<Feather name="arrow-right-circle" size={20} color="#000000ff" />}
             iconBg="#F3F4F6"
@@ -118,8 +134,6 @@ export default function ProfileScreen() {
             subtitle="Send a test notification"
             onPress={() => router.push('/profile/test_notifications')}
           />
-
-          {/* Test Location */}
           <MenuCard
             icon={<Feather name="arrow-right-circle" size={20} color="#000000ff" />}
             iconBg="#F3F4F6"
@@ -150,7 +164,13 @@ const MenuCard = ({ icon, iconBg, title, subtitle, titleColor, onPress }) => (
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F3F4F6' },
   scrollView: { flex: 1 },
-  headerGradient: { paddingHorizontal: 24, paddingTop: 60, paddingBottom: 32, borderBottomLeftRadius: 24, borderBottomRightRadius: 24 },
+  headerGradient: {
+    paddingHorizontal: 24,
+    paddingTop: 60,
+    paddingBottom: 32,
+    borderBottomLeftRadius: 24,
+    borderBottomRightRadius: 24,
+  },
   profileSection: { alignItems: 'center' },
   avatarContainer: { position: 'relative', marginBottom: 16 },
   avatarBorder: { width: 96, height: 96, borderRadius: 48, backgroundColor: '#fff', padding: 4 },
@@ -158,7 +178,14 @@ const styles = StyleSheet.create({
   name: { fontSize: 28, fontFamily: 'Bahnschrift-SemiBold', fontWeight: '600', color: '#FFFFFF', marginBottom: 4 },
   email: { fontSize: 14, fontFamily: 'Segoe UI', fontWeight: '300', color: '#FFFFFF' },
   menuContainer: { paddingHorizontal: 16, gap: 12, marginBottom: 100, marginTop: 24 },
-  menuCard: { backgroundColor: '#FFFFFF', borderRadius: 12, padding: 20, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  menuCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    padding: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
   menuContent: { flexDirection: 'row', alignItems: 'center', flex: 1 },
   iconCircle: { width: 40, height: 40, borderRadius: 20, justifyContent: 'center', alignItems: 'center', marginRight: 16 },
   menuText: { flex: 1 },
