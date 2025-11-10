@@ -105,64 +105,91 @@ export default function CompanyApp() {
   // ✅ NEW: Handle “Yes” (link app)
   const handleLinkApp = async () => {
     try {
-      // 1. Load token safely
-      const storedToken = await AsyncStorage.getItem("accessToken");
-      let token = null;
-
-      if (storedToken) {
-        try {
-          const parsed = JSON.parse(storedToken);
-          token = parsed.access ? parsed.access : storedToken;
-        } catch {
-          token = storedToken;
-        }
-      }
-
+      // 1️⃣ Get the access token directly (stored as a string)
+      let token = await AsyncStorage.getItem("accessToken");
       if (!token) {
         Alert.alert("Not signed in", "Please sign in first.");
         return;
       }
 
-      // 2. Send link request
-      const response = await fetch("https://rewardshub.online/api/link-app/", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ app_id: reference, notify: true }),
-      });
+      const body = { app_id: reference, notify: true };
 
-      const text = await response.text();
-      console.log("Raw link app response:", text);
+      const makeRequest = async (bearerToken) => {
+        return fetch("https://rewardshub.online/api/link-app/", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${bearerToken}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(body),
+        });
+      };
 
+      // 2️⃣ Send initial link request
+      let response = await makeRequest(token);
+
+      // 3️⃣ Handle expired token
+      if (response.status === 401) {
+        const refresh = await AsyncStorage.getItem("refreshToken");
+        if (refresh) {
+          const refreshResponse = await fetch(
+            "https://rewardshub.online/api/token/refresh/",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ refresh }),
+            }
+          );
+
+          if (refreshResponse.ok) {
+            const refreshData = await refreshResponse.json();
+            token = refreshData.access;
+            await AsyncStorage.setItem("accessToken", token);
+            response = await makeRequest(token);
+          } else {
+            Alert.alert(
+              "Session expired",
+              "Please sign in again to link this app."
+            );
+            await AsyncStorage.clear();
+            router.replace("/profile/logout");
+            return;
+          }
+        } else {
+          Alert.alert(
+            "Session expired",
+            "Please sign in again to link this app."
+          );
+          await AsyncStorage.clear();
+          router.replace("/profile/logout");
+          return;
+        }
+      }
+
+      // 4️⃣ Parse response safely
       let data = {};
       try {
-        data = JSON.parse(text);
+        data = await response.json();
       } catch {
         console.warn("Server did not return valid JSON.");
       }
 
-      console.log("Status:", response.status, "Parsed data:", data);
+      console.log("Link app response:", response.status, data);
 
-      // 3. Handle outcomes
+      // 5️⃣ Handle outcomes
       if (response.ok) {
         setIsActive(true);
         setProgramAdded(true);
 
-        // 4. Update AsyncStorage
+        // Update AsyncStorage linkedApps
         const stored = await AsyncStorage.getItem("linkedApps");
         const linkedApps = stored ? JSON.parse(stored) : [];
-
-        const exists = linkedApps.some((app) => app.reference === reference);
-        if (!exists) {
+        if (!linkedApps.some((app) => app.reference === reference)) {
           linkedApps.push({ reference, isActive: true, notify: true });
           await AsyncStorage.setItem("linkedApps", JSON.stringify(linkedApps));
         }
 
-        console.log("Updated linkedApps in AsyncStorage:", linkedApps);
-      } else if (response.status === 401) {
-        Alert.alert("Unauthorized", "Your session has expired. Please sign in again.");
+        console.log("Updated linkedApps:", linkedApps);
       } else if (response.status === 404) {
         Alert.alert("Error", data.error || "App not found.");
       } else {
@@ -175,6 +202,7 @@ export default function CompanyApp() {
       setShowPrompt(false);
     }
   };
+
 
 
   const openApp = async (website, downloadIOS, downloadAndroid) => {
@@ -211,34 +239,103 @@ export default function CompanyApp() {
     }
   };
 
+
   const toggleNotify = async () => {
+    console.log("🟢 toggleNotify called");
+
     try {
-      const token = await AsyncStorage.getItem("accessToken");
-      if (!token) return;
+      let token = await AsyncStorage.getItem("accessToken");
+      console.log("🔑 Token:", token ? "✅ found" : "❌ missing");
 
-      const newStatus = !isActive; // flip current state
+      if (!token) {
+        console.warn("⚠️ No token found, aborting.");
+        return;
+      }
 
-      const response = await fetch("https://rewardshub.online/api/link-app/", {
-        method: "POST", // reuse existing endpoint
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ app_id: reference, notify: newStatus }),
-      });
+      const newStatus = !isActive;
+      const url = "https://rewardshub.online/api/link-app/";
+      const body = { app_id: reference, notify: newStatus };
 
-      const data = await response.json().catch(() => ({}));
-      console.log("Toggle notify response:", data);
+      console.log("🔁 New notify status (client-side):", newStatus);
+      console.log("📡 Sending request to:", url);
+      console.log("📦 Request body:", body);
 
-      // Update local state regardless of "already linked"
+      // Define fetch options
+      const makeRequest = async (bearer) => {
+        return fetch(url, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${bearer}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(body),
+        });
+      };
+
+      let response = await makeRequest(token);
+
+      // If token expired, try refreshing it
+      if (response.status === 401) {
+        console.warn("⚠️ Token expired, attempting refresh...");
+
+        const refresh = await AsyncStorage.getItem("refreshToken");
+        if (refresh) {
+          const refreshResponse = await fetch(
+            "https://rewardshub.online/api/token/refresh/",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ refresh }),
+            }
+          );
+
+          if (refreshResponse.ok) {
+            const refreshData = await refreshResponse.json();
+            token = refreshData.access;
+            await AsyncStorage.setItem("accessToken", token);
+            console.log("🔄 Token refreshed successfully.");
+
+            // Retry the original request
+            response = await makeRequest(token);
+          } else {
+            console.error("❌ Failed to refresh token, user may need to log in again.");
+            return;
+          }
+        } else {
+          console.error("❌ No refresh token available.");
+          return;
+        }
+      }
+
+      const text = await response.text();
+      console.log("📥 Response status:", response.status);
+      console.log("🧾 Raw response text:", text);
+
+      let data = {};
+      try {
+        data = JSON.parse(text);
+      } catch {
+        console.warn("⚠️ Failed to parse JSON response");
+      }
+
+      console.log("✅ Parsed response data:", data);
+
+      if (!response.ok) {
+        console.warn("⚠️ Server returned non-OK status:", response.status);
+      }
+
+      if (data.notify !== undefined) {
+        console.log(`🔔 Backend notify status: ${data.notify}`);
+      } else {
+        console.log("ℹ️ Backend didn't return a notify field.");
+      }
+
       setIsActive(newStatus);
+      console.log("🎉 Local state updated to:", newStatus);
     } catch (err) {
-      console.error("Error toggling notifications:", err);
+      console.error("💥 Error toggling notifications:", err);
     }
   };
-
-
-
 
   return (
     <View style={styles.container}>
@@ -312,7 +409,28 @@ export default function CompanyApp() {
             marginHorizontal: 24,
             marginBottom: 24,
           }}
-          onPress={programAdded ? removeApp : () => setShowPrompt(true)}
+          onPress={() => {
+            if (programAdded) {
+              // ✅ Show confirmation alert
+              Alert.alert(
+                "Remove App",
+                `Are you sure you want to remove ${name || reference}?`,
+                [
+                  {
+                    text: "Cancel",
+                    style: "cancel"
+                  },
+                  {
+                    text: "Remove",
+                    style: "destructive",
+                    onPress: removeApp
+                  }
+                ]
+              );
+            } else {
+              setShowPrompt(true);
+            }
+          }}
         >
           <Text style={{ color: '#fff', fontSize: 16, fontWeight: '600' }}>
             {programAdded ? 'Remove App' : 'Add to My Programs'}

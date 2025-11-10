@@ -1,4 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { useState } from 'react';
 import { KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
@@ -7,29 +8,41 @@ export default function FeedbackPage() {
   const [status, setStatus] = useState(null);
 
   const sendFeedback = async () => {
-    if (!feedback.trim()) {
-      setStatus('Please enter some feedback first.');
+  if (!feedback.trim()) {
+    setStatus('Please enter some feedback first.');
+    return;
+  }
+
+  try {
+    // Read JWT token saved as "accessToken" after login
+    const token = await AsyncStorage.getItem('accessToken');
+    console.log("JWT token from AsyncStorage:", token); // debug
+
+    if (!token) {
+      setStatus('⚠️ You must be logged in to send feedback.');
       return;
     }
 
-    try {
-      const response = await fetch('https://rewardshub.online/api/feedback/', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ feedback }),
-      });
+    const response = await fetch('https://rewardshub.online/api/feedback/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`, // required by SimpleJWT
+      },
+      body: JSON.stringify({ feedback }),
+    });
 
-      const data = await response.json();
+    const data = await response.json();
 
-      if (response.ok) {
-        setStatus('✅ Feedback sent successfully!');
-        setFeedback('');
-      } else {
-        setStatus(`❌ Error: ${data.message || 'Failed to send feedback.'}`);
-      }
-    } catch (error) {
-      setStatus(`❌ Network error: ${error.message}`);
+    if (response.ok) {
+      setStatus('✅ Feedback received! Thank you!');
+      setFeedback('');
+    } else {
+      setStatus(`❌ Error: ${data.message || data.detail || 'Failed to send feedback.'}`);
     }
+  } catch (error) {
+    setStatus(`❌ Network error: ${error.message}`);
+  }
   };
 
   return (
