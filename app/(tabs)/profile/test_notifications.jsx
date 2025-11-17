@@ -28,22 +28,25 @@ export default function TestNotificationsPage() {
     requestPermissions();
   }, []);
 
-  // 🚀 Trigger a local test notification
-  const triggerNotification = async () => {
+  const triggerNotification = async ({companyName = "Chick-Fil-A", reference = "chick-fil-a"}) => {
     try {
       await Notifications.scheduleNotificationAsync({
         content: {
-          title: '🐱 Rhemi says hi!',
-          body: 'This is your test notification from RewardsHub 🎉',
+          title: `${companyName} is nearby!`,
+          body: `Tap to view your rewards.`,
           sound: true,
+          data: {
+            route: `/(tabs)/rewards/${reference}`,
+          },
         },
-        trigger: null, // null = fire immediately
+        trigger: null, // fire immediately
       });
     } catch (error) {
-      console.error('Error sending notification:', error);
-      Alert.alert('Error', 'Could not send notification.');
+      console.error("Error sending notification:", error);
+      Alert.alert("Error", "Could not send notification.");
     }
   };
+
 
   return (
     <View style={styles.container}>

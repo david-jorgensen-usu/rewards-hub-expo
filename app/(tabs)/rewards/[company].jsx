@@ -1,3 +1,4 @@
+import rewards from '@/data/companyData';
 import { Ionicons } from '@expo/vector-icons';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -20,17 +21,23 @@ import {
 export default function CompanyApp() {
   const params = useLocalSearchParams();
   const router = useRouter();
-  const {
-    reference,
-    logoFile,
-    squareLogo,
-    website,
-    downloadIOS,
-    downloadAndroid,
-    appScheme,
-    color,
-    name, // 👈 if available, otherwise can use reference
-  } = params;
+  // try to find company data by reference
+  const company =
+    rewards.find(item => item.reference === params.company) || {};
+
+  // use params first, fallback to company data
+  const reference = params.reference || company.reference;
+  const logoFile = params.logoFile || company.logoFile;
+  const squareLogo = params.squareLogo || company.squareLogo;
+  const website = params.website || company.website;
+  const downloadIOS = params.downloadIOS || company.downloadIOS;
+  const downloadAndroid = params.downloadAndroid || company.downloadAndroid;
+  const appScheme = params.appScheme || company.appScheme;
+  const color = params.color || company.color;
+  const name = params.name || company.name || reference;
+
+  console.log("CompanyApp company:", company);
+  console.log("Company reference:", reference);
 
   const [showPrompt, setShowPrompt] = useState(false); // 👈 added for modal visibility
   const [isActive, setIsActive] = useState(false);
