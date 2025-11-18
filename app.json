@@ -4,7 +4,7 @@
     "slug": "rewardshub",
     "version": "1.0.0",
     "scheme": "rewardshub",
-    "icon": "./assets/icons/rewardshub-icon-square.png",
+    "icon": "./assets/icons/rewardshub-icon-rescaled.png",
     "splash": {
       "image": "./assets/icons/rewardshub-splash-new.png",
       "resizeMode": "contain",

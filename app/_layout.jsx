@@ -4,7 +4,7 @@ import { Slot, useRouter, useSegments } from "expo-router";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, View } from "react-native"; // <-- add this
 
-import { startGeofencing } from "./background/Geofencing";
+import { startGeofencing } from "../background/Geofencing";
 
 useEffect(() => {
   startGeofencing();
