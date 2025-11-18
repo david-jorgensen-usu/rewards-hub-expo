@@ -18,19 +18,32 @@
       }
     },
     "android": {
+      "package": "com.rewardshubonline.rewardshub",
       "adaptiveIcon": {
         "foregroundImage": "./assets/icons/rewardshub-icon-rescaled.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.rewardshubonline.rewardshub"
+
+      "permissions": [
+        "NOTIFICATIONS",
+        "POST_NOTIFICATIONS",
+        "VIBRATE",
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_BACKGROUND_LOCATION"
+      ]
     },
+
     "extra": {
       "eas": {
         "projectId": "ee9e03d6-b71f-44b6-abfc-f9c7f5e7d664"
       }
     },
+
     "plugins": [
-      "expo-secure-store"
+      "expo-secure-store",
+      "expo-location",
+      "expo-notifications"
     ]
   }
 }
