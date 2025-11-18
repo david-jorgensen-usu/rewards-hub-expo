@@ -19,7 +19,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/icons/rewardshub-icon-square.png",
+        "foregroundImage": "./assets/icons/rewardshub-icon-rescaled.png",
         "backgroundColor": "#ffffff"
       },
       "package": "com.rewardshubonline.rewardshub"
