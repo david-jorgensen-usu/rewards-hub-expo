@@ -11,7 +11,7 @@ const COMPANIES = [
   { id: 3, name: "Natural Resources Building", lat: 41.7424, lng: -111.8080, trigger_radius: 100 },
   { id: 4, name: "Ray B. West Building", lat: 41.7435, lng: -111.8090, trigger_radius: 100 },
   { id: 5, name: "Dee Glen Smith Spectrum", lat: 41.74768, lng: -111.81200, trigger_radius: 150 },
-  { id: 6, name: "Chase Fine Arts Center", lat: 41.7445, lng: -111.8140, trigger_radius: 100 },
+  { id: 6, name: "Kachow", lat: 41.74395899238067, lng: -111.81567194271624, trigger_radius: 100 },
   { id: 7, name: "Geology Building", lat: 41.7450, lng: -111.8085, trigger_radius: 100 },
   { id: 8, name: "Quinney Library / Research Library", lat: 41.74339, lng: -111.80975, trigger_radius: 100 },
   { id: 9, name: "Morty's", lat: 41.744289, lng: -111.815131, trigger_radius: 15 },

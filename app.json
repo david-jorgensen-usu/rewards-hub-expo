@@ -22,14 +22,15 @@
 
     "android": {
       "permissions": [
-        "NOTIFICATIONS",
-        "POST_NOTIFICATIONS",
-        "VIBRATE",
         "ACCESS_FINE_LOCATION",
         "ACCESS_COARSE_LOCATION",
         "ACCESS_BACKGROUND_LOCATION",
         "FOREGROUND_SERVICE",
-        "FOREGROUND_SERVICE_LOCATION"
+        "FOREGROUND_SERVICE_LOCATION",
+        "VIBRATE",
+        "POST_NOTIFICATIONS",
+        "INTERNET",
+        "WAKE_LOCK"
       ],
       "adaptiveIcon": {
         "foregroundImage": "./assets/icons/rewardshub-icon-square.png",
