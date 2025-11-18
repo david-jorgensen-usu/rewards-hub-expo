@@ -1,10 +1,12 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Stack, useRouter, useSegments } from "expo-router";
-import { useEffect, useState } from "react";
-import { ActivityIndicator, View } from "react-native";
 import * as Notifications from "expo-notifications";
+import { useRouter, useSegments } from "expo-router";
+import { useEffect, useState } from "react";
+import { ActivityIndicator, View } from "react-native"; // <-- add this
+import { Slot } from "expo-router";
 
-// Modern notification handler
+
+// --- Notification handler ---
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowBanner: true,
@@ -22,25 +24,23 @@ export default function RootLayout() {
   const [authReady, setAuthReady] = useState(false);
   const [notifChecked, setNotifChecked] = useState(false);
 
-  // 🔔 1️⃣ Cold start / last notification
+  // 🔔 Cold start / last notification
   useEffect(() => {
-    const last = Notifications.getLastNotificationResponse();
-    const data = last?.notification?.request?.content?.data;
-
-    if (data?.route) {
-      setInitialRoute(data.route);
-    }
-    setNotifChecked(true);
+    const checkLastNotification = async () => {
+      const last = await Notifications.getLastNotificationResponseAsync();
+      const data = last?.notification?.request?.content?.data;
+      if (data?.route) setInitialRoute(data.route);
+      setNotifChecked(true);
+    };
+    checkLastNotification();
   }, []);
 
-  // 🔔 2️⃣ Live notification listener (foreground/background)
+  // 🔔 Live notification listener
   useEffect(() => {
     const subscription = Notifications.addNotificationResponseReceivedListener(
       (response) => {
         const data = response.notification.request.content.data;
-        if (data?.route) {
-          router.push(data.route);
-        }
+        if (data?.route) router.push(data.route);
       }
     );
     return () => subscription.remove();
@@ -54,11 +54,8 @@ export default function RootLayout() {
         const inAuthGroup =
           segments[0] === "signin" || segments[0] === "signup";
 
-        if (!token && !inAuthGroup) {
-          setInitialRoute("/signin");
-        } else if (token && inAuthGroup) {
-          setInitialRoute("/(tabs)");
-        }
+        if (!token && !inAuthGroup) setInitialRoute("/signin");
+        else if (token && inAuthGroup) setInitialRoute("/(tabs)");
       } catch (e) {
         console.error("Auth error:", e);
       } finally {
@@ -71,9 +68,7 @@ export default function RootLayout() {
   // Navigate once when both auth + notification checks done
   useEffect(() => {
     if (!authReady || !notifChecked) return;
-    if (initialRoute) {
-      router.replace(initialRoute);
-    }
+    if (initialRoute) router.replace(initialRoute);
   }, [authReady, notifChecked, initialRoute]);
 
   // Loading screen
@@ -85,5 +80,5 @@ export default function RootLayout() {
     );
   }
 
-  return <Stack screenOptions={{ headerShown: false }} />;
+  return <Slot />;
 }
