@@ -1,10 +1,14 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Notifications from "expo-notifications";
-import { useRouter, useSegments } from "expo-router";
+import { Slot, useRouter, useSegments } from "expo-router";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, View } from "react-native"; // <-- add this
-import { Slot } from "expo-router";
 
+import { startGeofencing } from "./background/Geofencing";
+
+useEffect(() => {
+  startGeofencing();
+}, []);
 
 // --- Notification handler ---
 Notifications.setNotificationHandler({
