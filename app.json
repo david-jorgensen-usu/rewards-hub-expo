@@ -5,11 +5,13 @@
     "version": "1.0.0",
     "scheme": "rewardshub",
     "icon": "./assets/icons/rewardshub-icon-rescaled.png",
+
     "splash": {
       "image": "./assets/icons/rewardshub-splash-new.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
+
     "ios": {
       "bundleIdentifier": "com.rewardshubonline.rewardshub",
       "supportsTablet": true,
@@ -17,21 +19,23 @@
         "ITSAppUsesNonExemptEncryption": false
       }
     },
-    "android": {
-      "package": "com.rewardshubonline.rewardshub",
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/icons/rewardshub-icon-rescaled.png",
-        "backgroundColor": "#ffffff"
-      },
 
+    "android": {
       "permissions": [
         "NOTIFICATIONS",
         "POST_NOTIFICATIONS",
         "VIBRATE",
         "ACCESS_FINE_LOCATION",
         "ACCESS_COARSE_LOCATION",
-        "ACCESS_BACKGROUND_LOCATION"
-      ]
+        "ACCESS_BACKGROUND_LOCATION",
+        "FOREGROUND_SERVICE",
+        "FOREGROUND_SERVICE_LOCATION"
+      ],
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/icons/rewardshub-icon-square.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.rewardshubonline.rewardshub"
     },
 
     "extra": {
@@ -41,9 +45,7 @@
     },
 
     "plugins": [
-      "expo-secure-store",
-      "expo-location",
-      "expo-notifications"
+      "expo-secure-store"
     ]
   }
 }
