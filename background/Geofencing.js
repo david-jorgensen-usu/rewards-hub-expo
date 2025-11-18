@@ -1,17 +1,18 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Location from "expo-location";
 import * as TaskManager from "expo-task-manager";
 import { showNotification } from "../utils/Notifications";
 
 export const GEOFENCE_TASK_NAME = "GEOFENCE_TASK";
 
-// --- Hardcoded list of 20 locations near Logan, UT ---
+// --- Your company list ---
 const COMPANIES = [
   { id: 1, name: "Old Main", lat: 41.740833, lng: -111.813056, trigger_radius: 100 },
   { id: 2, name: "Merrill-Cazier Library", lat: 41.7410, lng: -111.8085, trigger_radius: 100 },
   { id: 3, name: "Natural Resources Building", lat: 41.7424, lng: -111.8080, trigger_radius: 100 },
   { id: 4, name: "Ray B. West Building", lat: 41.7435, lng: -111.8090, trigger_radius: 100 },
   { id: 5, name: "Dee Glen Smith Spectrum", lat: 41.74768, lng: -111.81200, trigger_radius: 150 },
-  { id: 6, name: "Kachow", lat: 41.74395899238067, lng: -111.81567194271624, trigger_radius: 100 },
+  { id: 6, name: "Kachow", lat: 41.74395899238067, lng: -111.81567194271624, trigger_radius: 40 },
   { id: 7, name: "Geology Building", lat: 41.7450, lng: -111.8085, trigger_radius: 100 },
   { id: 8, name: "Quinney Library / Research Library", lat: 41.74339, lng: -111.80975, trigger_radius: 100 },
   { id: 9, name: "Morty's", lat: 41.744289, lng: -111.815131, trigger_radius: 15 },
@@ -29,29 +30,7 @@ const COMPANIES = [
   { id: 20, name: "Test Building K", lat: 41.7500, lng: -111.8200, trigger_radius: 100 }
 ];
 
-// --- Define geofence background task ---
-TaskManager.defineTask(GEOFENCE_TASK_NAME, ({ data, error }) => {
-  if (error) {
-    console.error("Geofence task error:", error);
-    return;
-  }
-  if (!data?.locations?.length) return;
-
-  const { latitude, longitude } = data.locations[0].coords;
-
-  COMPANIES.forEach((company) => {
-    const distance = getDistance(latitude, longitude, company.lat, company.lng);
-    if (distance <= company.trigger_radius) {
-      showNotification({
-        title: `Nearby: ${company.name}`,
-        body: `You are close to ${company.name}!`,
-        data: { companyId: company.id },
-      });
-    }
-  });
-});
-
-// --- Haversine formula for distance in meters ---
+// --- Helper: Haversine formula ---
 function getDistance(lat1, lon1, lat2, lon2) {
   const R = 6371000; // meters
   const dLat = deg2rad(lat2 - lat1);
@@ -68,7 +47,38 @@ function deg2rad(deg) {
   return deg * (Math.PI / 180);
 }
 
-// --- Start background geofencing ---
+// --- Define background task ---
+TaskManager.defineTask(GEOFENCE_TASK_NAME, async ({ data, error }) => {
+  if (error) {
+    console.error("Geofence task error:", error);
+    return;
+  }
+  if (!data?.locations?.length) return;
+
+  const { latitude, longitude } = data.locations[0].coords;
+
+  for (const company of COMPANIES) {
+    const distance = getDistance(latitude, longitude, company.lat, company.lng);
+    if (distance <= company.trigger_radius) {
+      const key = `lastNotif_${company.id}`;
+      const last = await AsyncStorage.getItem(key);
+      const now = Date.now();
+
+      if (!last || now - parseInt(last, 10) > 1000 * 60 * 60) { // 1 hour
+        // Send notification
+        showNotification({
+          title: `Nearby: ${company.name}`,
+          body: `You are close to ${company.name}!`,
+          data: { companyId: company.id },
+        });
+        // Save timestamp
+        await AsyncStorage.setItem(key, now.toString());
+      }
+    }
+  }
+});
+
+// --- Start geofencing ---
 export async function startGeofencing() {
   const { status } = await Location.requestForegroundPermissionsAsync();
   const { status: bgStatus } = await Location.requestBackgroundPermissionsAsync();
@@ -84,11 +94,11 @@ export async function startGeofencing() {
     timeInterval: 10000, // ~10s
     showsBackgroundLocationIndicator: false,
     foregroundService: {
-      notificationTitle: "RewardsHub",
+      notificationTitle: "Location Active",
       notificationBody: "Tracking your location for nearby rewards",
       notificationColor: "#2255EB",
     },
   });
 
-  console.log("✅ Geofencing started");
+  console.log("✅ Geofencing started with 1-notification-per-hour limit");
 }
